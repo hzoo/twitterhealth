@@ -1,0 +1,11 @@
+{
+  "name": "tweet-health",
+  "version": "0.0.1",
+  "description": "Visualizing Disease with tweet analysis",
+  "dependencies": {
+    "ntwitter": "~0.5.0",
+    "redis": "~0.10.1",
+    "jsonfile": "~1.1.1",
+    "dotenv": "~0.2.5"
+  }
+}
