@@ -2,7 +2,27 @@
 var dotenv = require('dotenv'),
 twitter = require('ntwitter'),
 jf = require('jsonfile');
+
+var express = require('express');
+var app     = express();
+var server  = require('http').createServer(app),
+io          = require('socket.io').listen(server);
 dotenv.load();
+io.set('log level', 1);
+
+//server
+var port    = process.env.PORT || 5000; // Use the port that Heroku provides or default to 5000
+server.listen(port, function() {
+  console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
+});
+
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/app/index.html');
+});
+
+app.use("/", express.static(__dirname + '/app'));
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+app.use(express.compress());
 
 //twitter
 var t = new twitter({
@@ -24,29 +44,32 @@ var t = new twitter({
 // }
 
 //variables
-var tweetFile        = './tweets.json';
 var trackWords = [
 //generic
-'ill','sick','sinus','painful',
+'sick','sinus','painful',
 //symptoms
 'runny nose','sore throat','chills','headache','allergy','inflammation',
 'fever','flu','infection','ache','insomnia',
 //medicine
 'meds', 'medicine'
 ];
-var tweets = [];
-var numTweets = 10;
 
-function getTweetInfo(tweet) {
+function getTweetInfo(tweet, state) {
   'use strict';
   var tweet_msg = {
     screen_name:  tweet.user.screen_name,
     text:  tweet.text,
-    // created_at:  tweet.created_at,
-    // id: tweet.id_str
+    coordinates: tweet.coordinates.coordinates,
+    place_name: tweet.place.full_name,
+    state: state,
+    id: tweet.id_str
   };
   return tweet_msg;
 }
+
+io.sockets.on('connection', function (socket) {
+  socket.emit("updated_states");
+});
 
 var tweet_stream;
 function getStream() {
@@ -59,18 +82,18 @@ function getStream() {
         tweet_stream = stream;
         stream.on('data', function(tweet) {
 
-          var tweet_data = getTweetInfo(tweet);
+          if (tweet.place && tweet.place.country_code === "US" && tweet.geo) {
+            var state = (tweet.place.full_name.split(',')[1]);
+            if (state)
+              state = state.trim();
+            //assert length
+            if (state !== undefined && state !== "US" && state.length == 2) {
+              var tweet_data = getTweetInfo(tweet,state);
+              console.log(tweet_data);
 
-          console.log(tweet_data);
-
-          tweets.push(tweet);
-
-          if (tweets.length === numTweets) {
-            jf.writeFile(tweetFile, tweets, function(err) {
-              console.log('error:',err);
-            })
+              io.sockets.volatile.emit('getTweet', tweet_data);
+            }
           }
-          // io.sockets.volatile.emit('sendTweet', tweet_data);
         });
 
         stream.on('error', function(tweet) {

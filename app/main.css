@@ -1,0 +1,51 @@
+.chart_bottom {
+    font-size: 12px;
+    position: absolute;
+    top: 471px;
+    right: 5px;
+}
+
+path.link {
+  fill: none;
+  stroke: yellow;
+  stroke-width: 1px;
+}
+
+.container {
+    width: 960px;
+    margin: 0px auto;
+    color: #474747;
+    font-size: 14px;
+    line-height: 18px;
+    font-family: "Helvetica Neue",Arial,sans-serif;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.states path {
+    fill: white;
+    stroke: #333;
+    stroke-width: 1.0px;
+}
+
+.hud_container {
+    position: relative;
+}
+
+#chart {
+    clear: both;
+}
+
+    #chart svg {
+        background-color: #eee;
+        /*width: 960px;*/
+        /*height: 490px;*/
+    }
+
+#search {
+    margin-left: 5px;
+    position: absolute;
+    left: 0;
+}

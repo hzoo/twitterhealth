@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <title>
+            Tweet-Health
+        </title>
+        <link type="text/css" rel="stylesheet" href="reset.css">
+        <!-- <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
+        <link type="text/css" rel="stylesheet" href="main.css">
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    </head>
+
+        <body>
+        <div class="container">
+            <div class="hud_container">
+                <form id="search" class="form-inline">
+                    <div class="input-prepend input-append">
+                        <input id="words" class="input-xlarge search-query" type="text" placeholder="Try: 'sleep,hungry,school' (Seperate by commas)" autofocus="autofocus">
+                        <button id="search_btn" type="submit" class="btn">
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="chart"></div>
+
+        </div>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js">
+        </script>
+        <script type="text/javascript" src="d3.v3.min.js">
+        </script>
+        <script type="text/javascript" src="main.js">
+        </script>
+    </body>
+
+</html>
