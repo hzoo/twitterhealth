@@ -28,11 +28,11 @@ app.use(express.compress());
 
 app.configure('production', function(){
     //reduce console logs
-    common.io.set('log level', 0);
-    common.io.enable('browser client minification');  // send minified client
-    common.io.enable('browser client etag');          // apply etag caching logic based on version number
-    common.io.enable('browser client gzip');          // gzip the file
-    common.io.set('transports', [
+    io.set('log level', 0);
+    io.enable('browser client minification');  // send minified client
+    io.enable('browser client etag');          // apply etag caching logic based on version number
+    io.enable('browser client gzip');          // gzip the file
+    io.set('transports', [
         'websocket',
         'htmlfile',
         'xhr-polling',
