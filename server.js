@@ -10,6 +10,7 @@ var server  = require('http').createServer(app),
 io          = require('socket.io').listen(server);
 dotenv.load();
 io.set('log level', 1);
+io.set('transports', ['websocket']);
 
 //server
 var port    = process.env.PORT || 5000; // Use the port that Heroku provides or default to 5000
@@ -24,6 +25,20 @@ app.get('/', function (req, res) {
 app.use("/", express.static(__dirname + '/app'));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(express.compress());
+
+app.configure('production', function(){
+    //reduce console logs
+    common.io.set('log level', 0);
+    common.io.enable('browser client minification');  // send minified client
+    common.io.enable('browser client etag');          // apply etag caching logic based on version number
+    common.io.enable('browser client gzip');          // gzip the file
+    common.io.set('transports', [
+        'websocket',
+        'htmlfile',
+        'xhr-polling',
+        'jsonp-polling'
+    ]);
+});
 
 //twitter
 var t = new twitter({
