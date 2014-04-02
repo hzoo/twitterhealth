@@ -1,4 +1,3 @@
-console.log(process.env.REDISCLOUD_URL);
 if (process.env.REDISCLOUD_URL) {
     console.log('url: ' + process.env.REDISCLOUD_URL);
     var redisURL = require('url').parse(process.env.REDISCLOUD_URL);
@@ -10,26 +9,26 @@ if (process.env.REDISCLOUD_URL) {
     var redis = require('redis').createClient();
 }
 
-//addTweet(tweet_data,'sick');
-function addTweet(tweet_data, type) {
-  var value = tweet_data.state + tweet_data.timeStamp + tweet_data.text;
-  if (type == 'sick') {
-    redis.zadd('sick',tweet_data.timeStamp,value);
-  } else if (type == 'not') {
-    redis.zadd('not',tweet_data.timeStamp,value);
-  } else {
-    redis.zadd('dono',tweet_data.timeStamp,value);
-  }
+//addTweet(tweetData,'sick');
+function addTweet(tweetData, type) {
+    var value = tweetData.state + tweetData.timeStamp + tweetData.text;
+    if (type === 'sick') {
+        redis.zadd('sick',tweetData.timeStamp,value);
+    } else if (type === 'not') {
+        redis.zadd('not',tweetData.timeStamp,value);
+    } else {
+        redis.zadd('dono',tweetData.timeStamp,value);
+    }
 }
 
 function getTweets(type, min, max) {
-  redis.zrangebyscore([type,min,max], function(err, res) {
-    console.log(res);
-  });
+    redis.zrangebyscore([type,min,max], function(err, res) {
+        console.log(res);
+    });
 }
 
 module.exports = {
-  redis: redis,
-  addTweet: addTweet,
-  getTweets: getTweets
-}
+    redis: redis,
+    addTweet: addTweet,
+    getTweets: getTweets
+};
