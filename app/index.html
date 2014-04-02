@@ -14,12 +14,17 @@
     <body>
         <div class="container">
             <div id="chart"></div>
-            <div id="tweet"></div>
-            <div class="buttons hidden">
-                <div class="btn btn-primary">Yes</div>
-                <div class="btn btn-danger">No</div>
-                <div class="btn btn-warning">Skip</div>
-                <div class="btn btn-info" id="getTweets">Get Tweets</div>
+            <div class="horizontal-center">
+                <div id="tweet"></div>
+                <div width="500" height="163" class="hidden tweet-box">
+                    <h1>Fetching a tweet...</h1>
+                </div>
+                <div class="buttons hidden horizontal-center">
+                    <div class="btn btn-primary">Yes</div>
+                    <div class="btn btn-danger">No</div>
+                    <div class="btn btn-warning">Skip</div>
+                    <div class="btn btn-info" id="getTweets">Get Tweets</div>
+                </div>
             </div>
         </div>
         <script src="//cdn.jsdelivr.net/g/jquery"></script>

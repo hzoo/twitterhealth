@@ -7,6 +7,14 @@
     font-family: "Helvetica Neue",Arial,sans-serif;
 }
 
+.horizontal-center {
+  margin: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 50%;
+}
+
 ::-webkit-scrollbar {
     display: none;
 }
@@ -52,4 +60,23 @@
     margin-left: 5px;
     position: absolute;
     left: 0;
+}
+
+.tweet-box {
+    display: block;
+    max-width: 99%;
+    min-width: 220px;
+    padding: 0px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin: 10px 0px;
+    border-color: rgb(238, 238, 238) rgb(221, 221, 221) rgb(187, 187, 187);
+    border-width: 1px;
+    border-style: solid;
+    box-shadow: rgba(0, 0, 0, 0.14902) 0px 1px 3px;
+    position: static;
+    visibility: visible;
+    text-align: center;
 }

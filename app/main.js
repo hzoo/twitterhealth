@@ -145,15 +145,19 @@ socket.on('updated_states', function () {
 // }
 
 function displayTweet(tweet) {
-    var html = '<div class=\'tweet_info\'>' +
-    '<a class=\'user_link\' href=\'' + 'https://twitter.com/' + tweet.screenName + '\' target=\'_blank\'>' +
-    '<span class =screenname>' + '@' + tweet.screenName + ' </span>' +
-    '</a>' +
-    '<span class =placeName>' + ' from ' + tweet.place_name + ' </span>' +
-    '<p class =text>' + tweet.text + ' </p>' +
-    '</div>';
+    // var html = '<div class=\'tweet_info\'>' +
+    // '<a class=\'user_link\' href=\'' + 'https://twitter.com/' + tweet.screenName + '\' target=\'_blank\'>' +
+    // '<span class =screenname>' + '@' + tweet.screenName + ' </span>' +
+    // '</a>' +
+    // '<span class =placeName>' + ' from ' + tweet.place_name + ' </span>' +
+    // '<p class =text>' + tweet.text + ' </p>' +
+    // '</div>';
 
+    var html =
+    '<blockquote class=\"twitter-tweet\">' +
+    '<a href=\"https://twitter.com/twitterapi/status/' + tweet.id + '\"></a></blockquote>';
     $('#tweet').html(html);
+    twttr.widgets.load();
 }
 
 socket.on('getTweet', function (sentData) {
@@ -189,6 +193,7 @@ socket.on('getTweet', function (sentData) {
             isTweetDisplayed = true;
             $('.buttons').removeClass('hidden');
             $('#tweet').removeClass('hidden');
+            $('.tweet-box').addClass('hidden');
             tweet = sentData;
             displayTweet(sentData);
         }
@@ -199,18 +204,21 @@ $('.btn-primary').click(function() {
     socket.emit('classfyTweet', 'sick', tweet);
     isTweetDisplayed = false;
     $('#tweet').addClass('hidden');
+    $('.tweet-box').removeClass('hidden');
 });
 
 $('.btn-danger').click(function() {
     socket.emit('classfyTweet', 'not', tweet);
     isTweetDisplayed = false;
     $('#tweet').addClass('hidden');
+    $('.tweet-box').removeClass('hidden');
 });
 
 $('.btn-warning').click(function() {
     socket.emit('classfyTweet', 'dono', tweet);
     isTweetDisplayed = false;
     $('#tweet').addClass('hidden');
+    $('.tweet-box').removeClass('hidden');
 });
 
 $('#getTweets').click(function() {
