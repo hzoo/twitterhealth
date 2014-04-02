@@ -2,13 +2,13 @@
 var dotenv = require('dotenv'),
 twitter = require('ntwitter'),
 jf = require('jsonfile');
-redisServer = require('./redisServer.js');
+dotenv.load();
 
+var redisServer = require('./redisServer.js');
 var express = require('express');
 var app     = express();
 var server  = require('http').createServer(app),
 io          = require('socket.io').listen(server);
-dotenv.load();
 io.set('log level', 1);
 io.set('transports', ['websocket']);
 
@@ -47,6 +47,8 @@ var t = new twitter({
   access_token_key:     process.env.ACCESS_TOKEN,
   access_token_secret:  process.env.ACCESS_TOKEN_SECRET
 });
+
+console.log(process.env.CONSUMER_KEY);
 
 //variables
 var trackWords = [

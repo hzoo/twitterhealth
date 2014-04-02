@@ -1,3 +1,4 @@
+console.log(process.env.REDISCLOUD_URL);
 if (process.env.REDISCLOUD_URL) {
     console.log('url: ' + process.env.REDISCLOUD_URL);
     var redisURL = require('url').parse(process.env.REDISCLOUD_URL);
