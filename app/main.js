@@ -194,31 +194,33 @@ socket.on('getTweet', function (sentData) {
             $('.buttons').removeClass('hidden');
             $('#tweet').removeClass('hidden');
             $('.tweet-box').addClass('hidden');
+            $('.buttons').children().removeClass('disabled');
             tweet = sentData;
             displayTweet(sentData);
         }
     }
 });
 
-$('.btn-primary').click(function() {
-    socket.emit('classfyTweet', 'sick', tweet);
+function onButtonClick() {
     isTweetDisplayed = false;
     $('#tweet').addClass('hidden');
     $('.tweet-box').removeClass('hidden');
+    $('.buttons').children().addClass('disabled');
+}
+
+$('.btn-primary').click(function() {
+    socket.emit('classfyTweet', 'sick', tweet);
+    onButtonClick();
 });
 
 $('.btn-danger').click(function() {
     socket.emit('classfyTweet', 'not', tweet);
-    isTweetDisplayed = false;
-    $('#tweet').addClass('hidden');
-    $('.tweet-box').removeClass('hidden');
+    onButtonClick();
 });
 
 $('.btn-warning').click(function() {
     socket.emit('classfyTweet', 'dono', tweet);
-    isTweetDisplayed = false;
-    $('#tweet').addClass('hidden');
-    $('.tweet-box').removeClass('hidden');
+    onButtonClick();
 });
 
 $('#getTweets').click(function() {
