@@ -1,32 +1,19 @@
 <!DOCTYPE html>
 <html>
-
     <head>
-        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-        <title>
-            Tweet-Health
-        </title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <title>TweetHealth</title>
         <link type="text/css" rel="stylesheet" href="reset.css">
         <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link type="text/css" rel="stylesheet" href="main.css">
         <script src="/socket.io/socket.io.js"></script>
     </head>
-
-        <body>
+    <body>
         <div class="container">
-<!--             <div class="hud_container">
-                <form id="search" class="form-inline">
-                    <div class="input-prepend input-append">
-                        <input id="words" class="input-xlarge search-query" type="text" placeholder="Try: 'sleep,hungry,school' (Seperate by commas)" autofocus="autofocus">
-                        <button id="search_btn" type="submit" class="btn">
-                            Search
-                        </button>
-                    </div>
-                </form>
-            </div> -->
-
             <div id="chart"></div>
-
             <div id="tweet"></div>
             <div class="buttons hidden">
                 <div class="btn btn-primary">Yes</div>
@@ -34,12 +21,10 @@
                 <div class="btn btn-warning">Skip</div>
                 <div class="btn btn-info" id="getTweets">Get Tweets</div>
             </div>
-
         </div>
         <script src="//cdn.jsdelivr.net/g/jquery"></script>
-        <script src="http://d3js.org/topojson.v1.min.js"></script>
         <script src="d3.v3.min.js"></script>
+        <script src="//d3js.org/topojson.v1.min.js"></script>
         <script src="main.js"></script>
     </body>
-
 </html>
