@@ -7,7 +7,6 @@ projection = d3.geo.albersUsa(),
 path       = d3.geo.path().projection(projection),
 points_html = [];
 
-// var words = ['me'];
 var area = {'AL':4822.023,'AK':731.449,'AZ':6553.255,'AR':2949.131,'CA':38041.430,'CO':5187.582,'CT':3590.347,'DE':917.092,'DC':632.323,'FL':19317.568,'GA':9919.945,'HI':1392.313,'ID':1595.728,'IL':12875.255,'IN':6537.334,'IA':3074.186,'KS':2885.905,'KY':4380.415,'LA':4601.893,'ME':1329.192,'MD':5884.563,'MA':6646.144,'MI':9883.360,'MN':5379.139,'MS':2984.926,'MO':6021.988,'MT':1005.141,'NE':1855.525,'NV':2758.931,'NH':1320.718,'NJ':8864.590,'NM':2085.538,'NY':19570.261,'NC':9752.073,'ND':699.628,'OH':11544.225,'OK':3814.820,'OR':3899.353,'PA':12763.536,'PR':3667.084,'RI':1050.292,'SC':4723.723,'SD':833.354,'TN':6456.243,'TX':26059.203,'UT':2855.287,'VT':626.011,'VA':8185.867,'WA':6897.012,'WV':1855.413,'WI':5726.398,'WY':576.412};
 
 var svg = d3.select('#chart')
@@ -23,6 +22,24 @@ var color = d3.scale.linear()
 
 var isTweetDisplayed = false;
 var tweet;
+
+// var words = ['me'];
+// $(document).ready(function() {
+//     $('input[type=text]').keypress(function (event) {
+//         if (event.keyCode === '13') { //jquery normalizes the keycode
+//             event.preventDefault(); //avoids default action
+//             // $(this).parent().find('input[type=submit]').trigger('click');
+//             $('#search_btn').trigger('click');
+//         }
+//     });
+// });
+
+// $('#search_btn').click(function() {
+//   if ($('#words').val() !== '') {
+//     words = $('#words').val().trim().replace(/[^a-z0-9\.,#]/gi,'').split(',');
+//     console.log('#search input: ' + words);
+//   }
+// });
 
 //socket.io
 if (location.host.split(':')[0] === 'localhost') {
@@ -41,17 +58,6 @@ d3.json('us-states-abbr.json', function(json) {
       .attr('class', 'state');
 });
 
-// if enter, click
-$(document).ready(function() {
-    $('input[type=text]').keypress(function (event) {
-        if (event.keyCode === '13') { //jquery normalizes the keycode
-            event.preventDefault(); //avoids default action
-            // $(this).parent().find('input[type=submit]').trigger('click');
-            $('#search_btn').trigger('click');
-        }
-    });
-});
-
 socket.on('updated_states', function () {
   initialize();
 });
@@ -61,7 +67,6 @@ function initialize() {
   points_html = [];
   updatePoints([]);
   d3.timer.flush();
-
   tweetDensity = get_reset_states();
 
   color.domain([0, d3.max(d3.values(tweetDensity))]);
@@ -169,13 +174,6 @@ function updatePoints(data) {
     .style('opacity', 0)
       .remove();
 }
-
-$('#search_btn').click(function() {
-  if ($('#words').val() !== '') {
-    words = $('#words').val().trim().replace(/[^a-z0-9\.,#]/gi,'').split(',');
-    console.log('#search input: ' + words);
-  }
-});
 
 $('.btn-primary').click(function() {
   socket.emit('classfyTweet', 'sick', tweet);
