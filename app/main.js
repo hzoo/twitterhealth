@@ -2,17 +2,24 @@ var data,
 isInitialized = false,
 tweetDensity,
 width      = 960,
-height     = 490,
-projection = d3.geo.albersUsa(),
-path       = d3.geo.path().projection(projection),
-points_html = [];
+height     = 500,
+projection = d3.geo.albersUsa();
+path = d3.geo.path().projection(projection),
+points_html = [],
+active = d3.select(null);
 
 var area = {'AL':4822.023,'AK':731.449,'AZ':6553.255,'AR':2949.131,'CA':38041.430,'CO':5187.582,'CT':3590.347,'DE':917.092,'DC':632.323,'FL':19317.568,'GA':9919.945,'HI':1392.313,'ID':1595.728,'IL':12875.255,'IN':6537.334,'IA':3074.186,'KS':2885.905,'KY':4380.415,'LA':4601.893,'ME':1329.192,'MD':5884.563,'MA':6646.144,'MI':9883.360,'MN':5379.139,'MS':2984.926,'MO':6021.988,'MT':1005.141,'NE':1855.525,'NV':2758.931,'NH':1320.718,'NJ':8864.590,'NM':2085.538,'NY':19570.261,'NC':9752.073,'ND':699.628,'OH':11544.225,'OK':3814.820,'OR':3899.353,'PA':12763.536,'PR':3667.084,'RI':1050.292,'SC':4723.723,'SD':833.354,'TN':6456.243,'TX':26059.203,'UT':2855.287,'VT':626.011,'VA':8185.867,'WA':6897.012,'WV':1855.413,'WI':5726.398,'WY':576.412};
 
 var svg = d3.select('#chart')
-  .append('svg:svg')
+  .append('svg')
   .attr('width', width)
   .attr('height', height);
+
+var background = svg.append("rect")
+    .attr("class", "background")
+    .attr("width", width)
+    .attr("height", height)
+    .on("click", reset);
 
 var states = svg.append('g')
     .attr('class', 'states');
@@ -48,15 +55,44 @@ if (location.host.split(':')[0] === 'localhost') {
     var socket = io.connect(location.host);
 }
 
-//show states
-d3.json('us-states-abbr.json', function(json) {
-  states.selectAll('path')
-      .data(json.features)
-    .enter().append('path')
-      .attr('d', path)
-      .attr('id', function(d) { return d.abbr;})
-      .attr('class', 'state');
+d3.json("us-named.json", function(error, us) {
+  states.selectAll("path")
+      .data(topojson.feature(us, us.objects.states).features)
+    .enter().append("path")
+      .attr("d", path)
+      .attr("class", "state")
+      .attr('id', function(d) { return d.properties.name;})
+      .on("click", clicked);
 });
+
+function clicked(d) {
+  if (active.node() === this) return reset();
+  active.classed("active", false);
+  active = d3.select(this).classed("active", true);
+
+  var bounds = path.bounds(d),
+      dx = bounds[1][0] - bounds[0][0],
+      dy = bounds[1][1] - bounds[0][1],
+      x = (bounds[0][0] + bounds[1][0]) / 2,
+      y = (bounds[0][1] + bounds[1][1]) / 2,
+      scale = .9 / Math.max(dx / width, dy / height),
+      translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+  states.transition()
+      .duration(750)
+      .style("stroke-width", 1.5 / scale + "px")
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+}
+
+function reset() {
+  active.classed("active", false);
+  active = d3.select(null);
+
+  states.transition()
+      .duration(750)
+      .style("stroke-width", "1.5px")
+      .attr("transform", "");
+}
 
 socket.on('updated_states', function () {
   initialize();
@@ -106,7 +142,7 @@ socket.on('getTweet', function (sent_data) {
         .transition()
           .duration(500)
           .style('fill', function(d) {
-                return color(tweetDensity[d.abbr]);
+                return color(tweetDensity[d.properties.code]);
             });
 
     if (points_html.length >= 100) {
@@ -149,7 +185,7 @@ function displayTweet(tweet) {
 }
 
 function updatePoints(data) {
-  var text = svg.selectAll('circle')
+  var text = states.selectAll('circle')
         .data(data, function(d) { return d.id; });
 
     text.enter().insert('svg:circle')
