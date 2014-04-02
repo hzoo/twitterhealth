@@ -1,15 +1,22 @@
-tweet-health
+TweetHealth
 ============
+
+![](http://i.imgur.com/4ne9TdD.png)
 
 To Install:
 - install [node.js](http://nodejs.org/)
 - download this repo (`git clone` or download the [zip file](https://github.com/eltacodeldiablo/tweet-health.git))
-- cd to the folder
-- run `npm install`
+- cd to the folder and run `npm install`
 - create the `.env` file (just copy .env-sample and replace it with your twitter credentials)
 
+```javascript
+CONSUMER_KEY=
+CONSUMER_SECRET=
+ACCESS_TOKEN=
+ACCESS_TOKEN_SECRET=
+REDISCLOUD_URL=
+```
+
 To Run:
-- change `var numTweets = 10;` if necessary to increase # of tweets to json
-- create `tweets.json`
 - run `node server.js`
-- `tweets.json` should be filled in
+- go to `localhost:5000` in your browser
