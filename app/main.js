@@ -21,6 +21,9 @@ var states = svg.append('g')
 var color = d3.scale.linear()
     .range(['rgb(247,251,255)','rgb(8,48,107)']);
 
+var isTweetDisplayed = false;
+var tweet;
+
 //socket.io
 if (location.host.split(':')[0] === 'localhost') {
     var socket = io.connect('http://localhost:5000');
@@ -114,8 +117,31 @@ socket.on('getTweet', function (sent_data) {
 
     updatePoints(points_html);
     d3.timer.flush();
+
+    if (!isTweetDisplayed) {
+      isTweetDisplayed = true;
+      $('.buttons').removeClass('hidden');
+      $('#tweet').removeClass('hidden');
+      tweet = sent_data;
+      displayTweet(sent_data);
+    }
   }
 });
+
+function displayTweet(tweet) {
+  var html = '<div class=\'tweet_info\'>'
+  + '<a class=\'user_link\' href=\'' + 'https://twitter.com/' + tweet.screen_name + '\' target=\'_blank\'>'
+  // + '<span class =fullname>' + tweet.name + '</span>'
+  + '<span>&nbsp;‏</span>'
+  + '<span class =screenname>' + '@' + tweet.screen_name + ' </span>'
+  + '</a>'
+  + '<span>&nbsp;‏</span>'
+  + '<span class =place_name>' + ' from ' + tweet.place_name + ' </span>'
+  + '<p class =text>' + tweet.text + ' </p>'
+  + '</div>';
+
+  $('#tweet').html(html);
+}
 
 function updatePoints(data) {
   var text = svg.selectAll('circle')
@@ -149,6 +175,28 @@ $('#search_btn').click(function() {
     words = $('#words').val().trim().replace(/[^a-z0-9\.,#]/gi,'').split(',');
     console.log('#search input: ' + words);
   }
+});
+
+$('.btn-primary').click(function() {
+  socket.emit('classfyTweet', 'sick', tweet);
+  isTweetDisplayed = false;
+  $('#tweet').addClass('hidden');
+});
+
+$('.btn-danger').click(function() {
+  socket.emit('classfyTweet', 'not', tweet);
+  isTweetDisplayed = false;
+  $('#tweet').addClass('hidden');
+});
+
+$('.btn-warning').click(function() {
+  socket.emit('classfyTweet', 'dono', tweet);
+  isTweetDisplayed = false;
+  $('#tweet').addClass('hidden');
+});
+
+$('#getTweets').click(function() {
+  socket.emit('getTweets');
 });
 
 function get_reset_states() {

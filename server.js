@@ -2,6 +2,7 @@
 var dotenv = require('dotenv'),
 twitter = require('ntwitter'),
 jf = require('jsonfile');
+redisServer = require('./redisServer.js');
 
 var express = require('express');
 var app     = express();
@@ -32,17 +33,6 @@ var t = new twitter({
   access_token_secret:  process.env.ACCESS_TOKEN_SECRET
 });
 
-//redis client
-// var redis   = require('redis'), client;
-// if (process.env.REDISTOGO_URL) {
-//   // TODO: redistogo connection
-//   var rtg = require('url').parse(process.env.REDISTOGO_URL);
-//   client  = require('redis').createClient(rtg.port, rtg.hostname);
-//   client.auth(rtg.auth.split(':')[1]);
-// } else {
-//   client  = require('redis').createClient();
-// }
-
 //variables
 var trackWords = [
 //generic
@@ -61,6 +51,7 @@ function getTweetInfo(tweet, state) {
     text:  tweet.text,
     coordinates: tweet.coordinates.coordinates,
     place_name: tweet.place.full_name,
+    timeStamp: Date.now().toString(),
     state: state,
     id: tweet.id_str
   };
@@ -69,6 +60,15 @@ function getTweetInfo(tweet, state) {
 
 io.sockets.on('connection', function (socket) {
   socket.emit("updated_states");
+
+  socket.on('classfyTweet', function(type, tweet) {
+    redisServer.addTweet(tweet, type);
+  });
+
+  socket.on('getTweets', function() {
+    redisServer.getTweets('sick','-inf','+inf');
+  });
+
 });
 
 var tweet_stream;
