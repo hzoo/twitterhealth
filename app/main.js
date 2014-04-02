@@ -22,6 +22,11 @@ var svg = d3.select('#chart')
   .attr('width', width)
   .attr('height', height);
 
+svg.append('rect')
+    .attr('class', 'background')
+    .attr('width', width)
+    .attr('height', height);
+
 var states = svg.append('g')
     .attr('class', 'states');
 
@@ -41,10 +46,7 @@ function reset() {
         .attr('transform', '');
 }
 
-svg.append('rect')
-    .attr('class', 'background')
-    .attr('width', width)
-    .attr('height', height)
+svg.selectAll('rect')
     .on('click', reset);
 
 function clicked(d) {
@@ -70,12 +72,14 @@ function clicked(d) {
 
 d3.json('us-named.json', function(error, us) {
     states.selectAll('path')
-    .data(topojson.feature(us, us.objects.states).features)
+    .data(topojson.feature(us, us.objects.states).features.filter(function(state){
+            return state.properties.code !== 'AK';
+        }))
         .enter().append('path')
         .attr('d', path)
         .attr('class', 'state')
         .attr('id', function(d) { return d.properties.name;})
-      . on('click', clicked);
+        .on('click', clicked);
 });
 
 function getResetStates() {

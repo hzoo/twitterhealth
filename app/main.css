@@ -1,10 +1,10 @@
 .container {
     width: 960px;
     margin: 0px auto;
-    color: #474747;
     font-size: 14px;
     line-height: 18px;
     font-family: "Helvetica Neue",Arial,sans-serif;
+    position: relative;
 }
 
 .horizontal-center {
@@ -20,7 +20,7 @@
 }
 
 .background {
-  fill: none;
+  fill: white;
   pointer-events: all;
 }
 
@@ -31,7 +31,7 @@
     stroke: #333;
 }
 
-.feature.active {
+.state.active {
     fill: orange;
 }
 
@@ -78,5 +78,9 @@
     box-shadow: rgba(0, 0, 0, 0.14902) 0px 1px 3px;
     position: static;
     visibility: visible;
+    text-align: center;
+}
+
+.buttons {
     text-align: center;
 }
