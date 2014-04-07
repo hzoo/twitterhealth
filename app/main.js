@@ -242,3 +242,17 @@ $('.btn-warning').click(function() {
 $('#getTweets').click(function() {
     socket.emit('getTweets');
 });
+
+$(document).on('keydown', function(event) {
+  console.log(event.which);
+  if ( event.which === 90 ) {
+     event.preventDefault();
+     $('.btn-primary').click();
+  } else if ( event.which === 88 ) {
+     event.preventDefault();
+     $('.btn-danger').click();
+  } else if ( event.which === 67 ) {
+     event.preventDefault();
+     $('.btn-warning').click();
+  }
+});
