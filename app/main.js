@@ -16,6 +16,7 @@ if (location.host.split(':')[0] === 'localhost') {
 }
 
 var area = {'AL':4822.023,'AK':731.449,'AZ':6553.255,'AR':2949.131,'CA':38041.430,'CO':5187.582,'CT':3590.347,'DE':917.092,'DC':632.323,'FL':19317.568,'GA':9919.945,'HI':1392.313,'ID':1595.728,'IL':12875.255,'IN':6537.334,'IA':3074.186,'KS':2885.905,'KY':4380.415,'LA':4601.893,'ME':1329.192,'MD':5884.563,'MA':6646.144,'MI':9883.360,'MN':5379.139,'MS':2984.926,'MO':6021.988,'MT':1005.141,'NE':1855.525,'NV':2758.931,'NH':1320.718,'NJ':8864.590,'NM':2085.538,'NY':19570.261,'NC':9752.073,'ND':699.628,'OH':11544.225,'OK':3814.820,'OR':3899.353,'PA':12763.536,'PR':3667.084,'RI':1050.292,'SC':4723.723,'SD':833.354,'TN':6456.243,'TX':26059.203,'UT':2855.287,'VT':626.011,'VA':8185.867,'WA':6897.012,'WV':1855.413,'WI':5726.398,'WY':576.412};
+var pop = {'ND': 723393.0, 'NE': 1868516.0, 'NC': 9848060.0, 'HI': 1404054.0, 'PR': 0, 'NM': 2085287.0, 'NJ': 8899339.0, 'NH': 1323459.0, 'NV': 2790136.0, 'AZ': 6626624.0, 'PA': 12773801.0, 'TN': 6495978.0, 'NY': 19651127.0, 'GA': 9992167.0, 'CT': 3596080.0, 'AL': 4833722.0, 'MT': 1015165.0, 'MS': 2991207.0, 'WV': 1854304.0, 'MO': 6044171.0, 'MN': 5420380.0, 'OK': 3850568.0, 'CA': 38332521.0, 'OR': 3930065.0, 'MI': 9895622.0, 'AR': 2959373.0, 'CO': 5268367.0, 'MD': 5928814.0, 'VT': 626630.0, 'MA': 6692824.0, 'AK': 735132.0, 'IA': 3090416.0, 'UT': 2900872.0, 'ID': 1612136.0, 'WY': 582658.0, 'TX': 26448193.0, 'IN': 6570902.0, 'IL': 12882135.0, 'WA': 6971406.0, 'KY': 4395295.0, 'RI': 1051511.0, 'WI': 5742713.0, 'ME': 1328302.0, 'KS': 2893957.0, 'DE': 925749.0, 'FL': 19552860.0, 'SC': 4774839.0, 'DC': 646449.0, 'OH': 11570808.0, 'SD': 844877.0, 'VA': 8260405.0, 'LA': 4625470.0};
 
 var svg = d3.select('#chart')
   .append('svg')
@@ -35,6 +36,7 @@ var color = d3.scale.linear()
 
 var isTweetDisplayed = false;
 var tweet;
+var tweetQueue = [];
 
 function reset() {
     active.classed('active', false);
@@ -83,7 +85,7 @@ d3.json('us-named.json', function(error, us) {
 });
 
 function getResetStates() {
-    return {'AL' : 0,'AK' : 0,'AZ' : 0,'AR' : 0,'CA' : 0,'CO' : 0,'CT' : 0,'DE' : 0,'DC' : 0,'FL' : 0,'GA' : 0,'HI' : 0,'ID' : 0,'IL' : 0,'IN' : 0,'IA' : 0,'KS' : 0,'KY' : 0,'LA' : 0,'ME' : 0,'MD' : 0,'MA' : 0,'MI' : 0,'MN' : 0,'MS' : 0,'MO' : 0,'MT' : 0,'NE' : 0,'NV' : 0,'NH' : 0,'NJ' : 0,'NM' : 0,'NY' : 0,'NC' : 0,'ND' : 0,'OH' : 0,'OK' : 0,'OR' : 0,'PA' : 0,'RI' : 0,'SC' : 0,'SD' : 0,'TN' : 0,'TX' : 0,'UT' : 0,'VT' : 0,'VA' : 0,'WA' : 0,'WV' : 0,'WI' : 0,'WY' : 0,'PR' : 0};
+    return {'AL' : [],'AK' : [],'AZ' : [],'AR' : [],'CA' : [],'CO' : [],'CT' : [],'DE' : [],'DC' : [],'FL' : [],'GA' : [],'HI' : [],'ID' : [],'IL' : [],'IN' : [],'IA' : [],'KS' : [],'KY' : [],'LA' : [],'ME' : [],'MD' : [],'MA' : [],'MI' : [],'MN' : [],'MS' : [],'MO' : [],'MT' : [],'NE' : [],'NV' : [],'NH' : [],'NJ' : [],'NM' : [],'NY' : [],'NC' : [],'ND' : [],'OH' : [],'OK' : [],'OR' : [],'PA' : [],'RI' : [],'SC' : [],'SD' : [],'TN' : [],'TX' : [],'UT' : [],'VI': [],'VT' : [],'VA' : [],'WA' : [],'WV' : [],'WI' : [],'WY' : [],'PR' : []};
 }
 
 function updatePoints(data) {
@@ -120,7 +122,7 @@ function initialize() {
     d3.timer.flush();
     tweetDensity = getResetStates();
 
-    color.domain([0, d3.max(d3.values(tweetDensity))]);
+    color.domain([0, 0]);
 
     states.selectAll('path')
         .transition()
@@ -148,18 +150,10 @@ socket.on('updated_states', function () {
 //     return false;
 // }
 
-function displayTweet(tweet) {
-    // var html = '<div class=\'tweet_info\'>' +
-    // '<a class=\'user_link\' href=\'' + 'https://twitter.com/' + tweet.screenName + '\' target=\'_blank\'>' +
-    // '<span class =screenname>' + '@' + tweet.screenName + ' </span>' +
-    // '</a>' +
-    // '<span class =placeName>' + ' from ' + tweet.place_name + ' </span>' +
-    // '<p class =text>' + tweet.text + ' </p>' +
-    // '</div>';
-
+function displayTweet(id) {
     var html =
     '<blockquote class=\"twitter-tweet\">' +
-    '<a href=\"https://twitter.com/twitterapi/status/' + tweet.id + '\"></a></blockquote>';
+    '<a href=\"https://twitter.com/twitterapi/status/' + id + '\"></a></blockquote>';
     $('#tweet').html(html);
     twttr.widgets.load();
 }
@@ -169,14 +163,22 @@ socket.on('getTweet', function (sentData) {
 
     if (isInitialized) {// && wordMatches(sentData.text,words) === true) {
         var state = sentData.state;
-        tweetDensity[state] += 1/area[state];
+        // tweetDensity[state] += 1/pop[state];
+        tweetDensity[state].push(sentData.id);
+        tweetQueue.push(sentData.id);
 
-        color.domain([0, d3.max(d3.values(tweetDensity))]);
+        var statesArray = [];
+        for (var state in tweetDensity) {
+            statesArray.push(state.length);
+        }
+
+        color.domain([0, d3.max(statesArray)]);
+
         states.selectAll('path')
             .transition()
               .duration(500)
               .style('fill', function(d) {
-                    return color(tweetDensity[d.properties.code]);
+                    return color(tweetDensity[d.properties.code].length);
                 });
 
         if (tweetLocations.length >= 100) {
@@ -199,17 +201,21 @@ socket.on('getTweet', function (sentData) {
             $('#tweet').removeClass('hidden');
             $('.tweet-box').addClass('hidden');
             $('.buttons').children().removeClass('disabled');
-            tweet = sentData;
-            displayTweet(sentData);
+            tweet = tweetQueue.shift();
+            displayTweet(tweet);
         }
     }
 });
 
 function onButtonClick() {
-    isTweetDisplayed = false;
-    $('#tweet').addClass('hidden');
-    $('.tweet-box').removeClass('hidden');
-    $('.buttons').children().addClass('disabled');
+    if (tweetQueue.length <= 1) {
+        isTweetDisplayed = false;
+        $('#tweet').addClass('hidden');
+        $('.tweet-box').removeClass('hidden');
+        $('.buttons').children().addClass('disabled');
+    }
+    tweet = tweetQueue.shift();
+    displayTweet(tweet);
 }
 
 $('.btn-primary').click(function() {
