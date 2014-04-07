@@ -150,10 +150,10 @@ socket.on('updated_states', function () {
 //     return false;
 // }
 
-function displayTweet(id) {
+function displayTweet(tweet) {
     var html =
     '<blockquote class=\"twitter-tweet\">' +
-    '<a href=\"https://twitter.com/twitterapi/status/' + id + '\"></a></blockquote>';
+    '<a href=\"https://twitter.com/twitterapi/status/' + tweet.id + '\"></a></blockquote>';
     $('#tweet').html(html);
     twttr.widgets.load();
 }
@@ -164,8 +164,14 @@ socket.on('getTweet', function (sentData) {
     if (isInitialized) {// && wordMatches(sentData.text,words) === true) {
         var state = sentData.state;
         // tweetDensity[state] += 1/pop[state];
-        tweetDensity[state].push(sentData.id);
-        tweetQueue.push(sentData.id);
+        tweetDensity[state].push({
+            id: sentData.id,
+            text: sentData.text
+        });
+        tweetQueue.push({
+            id: sentData.id,
+            text: sentData.text
+        });
 
         var statesArray = [];
         for (var state in tweetDensity) {

@@ -11,13 +11,12 @@ if (process.env.REDISCLOUD_URL) {
 
 //addTweet(tweetData,'sick');
 function addTweet(tweetData, type) {
-    var value = tweetData.state + tweetData.timeStamp + tweetData.text;
     if (type === 'sick') {
-        redis.zadd('sick',tweetData.timeStamp,value);
+        redis.zadd('sick',tweetData.id,tweetData.text);
     } else if (type === 'not') {
-        redis.zadd('not',tweetData.timeStamp,value);
+        redis.zadd('not',tweetData.id,tweetData.text);
     } else {
-        redis.zadd('dono',tweetData.timeStamp,value);
+        redis.zadd('dono',tweetData.id,tweetData.text);
     }
 }
 
