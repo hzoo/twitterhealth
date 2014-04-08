@@ -1,7 +1,6 @@
 //packages
 var dotenv = require('dotenv');
 var twitter = require('ntwitter');
-require('jsonfile');
 dotenv.load();
 
 var redisServer = require('./redisServer.js');

@@ -1,38 +1,18 @@
-.container {
-    width: 960px;
-    margin: 0px auto;
-    font-size: 14px;
-    line-height: 18px;
-    font-family: "Helvetica Neue",Arial,sans-serif;
-    position: relative;
-}
-
-.horizontal-center {
-  margin: auto;
-  position: absolute;
-  left: 0;
-  right: 0;
-  width: 50%;
-}
-
 ::-webkit-scrollbar {
     display: none;
 }
 
+body {
+    font-family: "Helvetica Neue",Arial,sans-serif;
+}
+
 .background {
-  fill: white;
-  pointer-events: all;
+    fill: lightgray;
+    pointer-events: all;
 }
 
-.state {
-    fill: #ccc;
-    cursor: pointer;
-    stroke-width: 0.2px;
-    stroke: #333;
-}
-
-.state.active {
-    fill: orange;
+.buttons {
+    text-align: center;
 }
 
 .mesh {
@@ -42,24 +22,11 @@
     stroke-linejoin: round;
 }
 
-.hud_container {
-    position: relative;
-}
-
-#chart {
-    clear: both;
-}
-
-    #chart svg {
-        background-color: #eee;
-        /*width: 960px;*/
-        /*height: 490px;*/
-    }
-
-#search {
-    margin-left: 5px;
-    position: absolute;
-    left: 0;
+.state {
+    fill: #ccc;
+    cursor: pointer;
+    stroke-width: 0.2px;
+    stroke: #333;
 }
 
 .tweet-box {
@@ -78,9 +45,5 @@
     box-shadow: rgba(0, 0, 0, 0.14902) 0px 1px 3px;
     position: static;
     visibility: visible;
-    text-align: center;
-}
-
-.buttons {
     text-align: center;
 }
