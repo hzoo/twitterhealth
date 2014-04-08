@@ -4,10 +4,11 @@
 
 body {
     font-family: "Helvetica Neue",Arial,sans-serif;
+    background: radial-gradient(circle,#94d2f8,#3a92c8);
 }
 
 .background {
-    fill: lightgray;
+    fill: none;
     pointer-events: all;
 }
 
@@ -27,6 +28,10 @@ body {
     cursor: pointer;
     stroke-width: 0.2px;
     stroke: #333;
+}
+
+.title {
+    color: white;
 }
 
 .tweet-box {
