@@ -2,7 +2,8 @@
 var isInitialized = false;
 var width      = 960;
 var height     = 500;
-var projection = d3.geo.albers();
+var mWidth = $('#chart').width();
+var projection = d3.geo.albers().translate([width / 2, height / 2]);
 var path = d3.geo.path().projection(projection);
 var tweetLocations = [];
 var active = d3.select(null);
@@ -19,9 +20,11 @@ var area = {'AL':4822.023,'AK':731.449,'AZ':6553.255,'AR':2949.131,'CA':38041.43
 var pop = {'ND': 723393.0, 'NE': 1868516.0, 'NC': 9848060.0, 'HI': 1404054.0, 'PR': 0, 'NM': 2085287.0, 'NJ': 8899339.0, 'NH': 1323459.0, 'NV': 2790136.0, 'AZ': 6626624.0, 'PA': 12773801.0, 'TN': 6495978.0, 'NY': 19651127.0, 'GA': 9992167.0, 'CT': 3596080.0, 'AL': 4833722.0, 'MT': 1015165.0, 'MS': 2991207.0, 'WV': 1854304.0, 'MO': 6044171.0, 'MN': 5420380.0, 'OK': 3850568.0, 'CA': 38332521.0, 'OR': 3930065.0, 'MI': 9895622.0, 'AR': 2959373.0, 'CO': 5268367.0, 'MD': 5928814.0, 'VT': 626630.0, 'MA': 6692824.0, 'AK': 735132.0, 'IA': 3090416.0, 'UT': 2900872.0, 'ID': 1612136.0, 'WY': 582658.0, 'TX': 26448193.0, 'IN': 6570902.0, 'IL': 12882135.0, 'WA': 6971406.0, 'KY': 4395295.0, 'RI': 1051511.0, 'WI': 5742713.0, 'ME': 1328302.0, 'KS': 2893957.0, 'DE': 925749.0, 'FL': 19552860.0, 'SC': 4774839.0, 'DC': 646449.0, 'OH': 11570808.0, 'SD': 844877.0, 'VA': 8260405.0, 'LA': 4625470.0};
 
 var svg = d3.select('#chart')
-  .append('svg')
-  .attr('width', width)
-  .attr('height', height);
+    .append('svg')
+    .attr("preserveAspectRatio", "xMidYMid")
+    .attr("viewBox", "0 0 " + width + " " + height)
+    .attr('width', mWidth)
+    .attr('height', mWidth * height / width);
 
 svg.append('rect')
     .attr('class', 'background')
@@ -37,6 +40,12 @@ var color = d3.scale.linear()
 var isTweetDisplayed = false;
 var tweet;
 var tweetQueue = [];
+
+$(window).resize(function() {
+    var w = $("#chart").width();
+    svg.attr("width", w);
+    svg.attr("height", w * height / width);
+});
 
 function reset() {
     active.classed('active', false);
