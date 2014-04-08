@@ -11,7 +11,7 @@ body {
     pointer-events: all;
 }
 
-.buttons {
+.buttons, .title {
     text-align: center;
 }
 

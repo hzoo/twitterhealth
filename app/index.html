@@ -6,32 +6,42 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <title>TweetHealth</title>
-        <link type="text/css" rel="stylesheet" href="reset.css">
-        <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-        <link type="text/css" rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/g/bootstrap(css/bootstrap.min.css)">
+        <link rel="stylesheet" href="main.css">
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
         <div class="container">
-            <h1>TweetHealth: Where Do People Need Help?</h1>
-            <div id="chart"></div>
-            <div class="horizontal-center">
-                <div id="tweet"></div>
-                <div width="500" height="163" class="tweet-box">
-                    <h2>Fetching a tweet...</h2>
+            <div class="row">
+                <div class="title">
+                    <h1>TweetHealth: Where Do People Need Help?</h1>
                 </div>
-                <div class="buttons hidden">
+            </div>
+            <div class="row">
+                <div class="col-md-offset-1 col-md-10">
+                    <div id="chart"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-offset-3 col-md-6">
+                    <div id="tweet"></div>
+                    <div width="500" height="163" class="tweet-box center-block">
+                        <h2>Fetching a tweet...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="buttons hidden center-block">
                     <div class="btn btn-primary">Sick [z]</div>
                     <div class="btn btn-danger">Not [x]</div>
                     <div class="btn btn-warning">Skip [c]</div>
                     <!-- <div class="btn btn-info" id="getTweets">Get Tweets</div> -->
                 </div>
             </div>
-        </div>
-        <script src="//cdn.jsdelivr.net/g/jquery"></script>
-        <script src="d3.v3.min.js"></script>
+        <!-- </div> -->
+        <script src="//cdn.jsdelivr.net/g/jquery,d3js"></script>
         <script src="//d3js.org/topojson.v1.min.js"></script>
         <script src="main.js"></script>
-        <script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+        <script src="twitter.js" charset="utf-8"></script>
     </body>
 </html>
