@@ -207,7 +207,9 @@ socket.on('getTweet', function (sentData) {
             $('#tweet').removeClass('hidden');
             $('.tweet-box').addClass('hidden');
             $('.buttons').children().removeClass('disabled');
-            tweet = tweetQueue.shift();
+            if (tweetQueue.length > 0) {
+                tweet = tweetQueue.shift();
+            }
             displayTweet(tweet);
         }
     }
@@ -220,7 +222,9 @@ function onButtonClick() {
         $('.tweet-box').removeClass('hidden');
         $('.buttons').children().addClass('disabled');
     }
-    tweet = tweetQueue.shift();
+    if (tweetQueue.length > 0) {
+        tweet = tweetQueue.shift();
+    }
     displayTweet(tweet);
 }
 
@@ -244,15 +248,14 @@ $('#getTweets').click(function() {
 });
 
 $(document).on('keydown', function(event) {
-  console.log(event.which);
-  if ( event.which === 90 ) {
-     event.preventDefault();
-     $('.btn-primary').click();
-  } else if ( event.which === 88 ) {
-     event.preventDefault();
-     $('.btn-danger').click();
-  } else if ( event.which === 67 ) {
-     event.preventDefault();
-     $('.btn-warning').click();
-  }
+    if (event.which === 90) {
+        event.preventDefault();
+        $('.btn-primary').click();
+    } else if (event.which === 88) {
+        event.preventDefault();
+        $('.btn-danger').click();
+    } else if (event.which === 67) {
+        event.preventDefault();
+        $('.btn-warning').click();
+    }
 });
