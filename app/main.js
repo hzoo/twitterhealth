@@ -32,7 +32,7 @@ var states = svg.append('g')
     .attr('class', 'states');
 
 var color = d3.scale.linear()
-    .range(['rgb(247,251,255)','rgb(8,48,107)']);
+    .range(['#f7fbff','#08306b']);
 
 var isTweetDisplayed = false;
 var tweet;
@@ -122,7 +122,7 @@ function initialize() {
     d3.timer.flush();
     tweetDensity = getResetStates();
 
-    color.domain([0, 0]);
+    color.domain([0, 1]);
 
     states.selectAll('path')
         .transition()
@@ -173,18 +173,15 @@ socket.on('getTweet', function (sentData) {
             text: sentData.text
         });
 
-        var statesArray = [];
-        for (var state in tweetDensity) {
-            statesArray.push(state.length);
-        }
-
-        color.domain([0, d3.max(statesArray)]);
+        color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
+            return v.length;
+        }))/pop[state]]);
 
         states.selectAll('path')
             .transition()
               .duration(500)
               .style('fill', function(d) {
-                    return color(tweetDensity[d.properties.code].length);
+                    return color(tweetDensity[d.properties.code].length/pop[state]);
                 });
 
         if (tweetLocations.length >= 100) {

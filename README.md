@@ -1,4 +1,4 @@
-TweetHealth
+TwitterHealth
 ============
 
 ![](http://i.imgur.com/4ne9TdD.png)
