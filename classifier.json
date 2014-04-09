@@ -1,0 +1,1 @@
+{"classifier":{"classFeatures":{"sick":{"0":2}},"classTotals":{"sick":2},"totalExamples":2,"smoothing":1},"docs":[{"label":"sick","text":["sick"]}],"features":{"sick":1},"stemmer":{},"lastAdded":1,"events":{"domain":null,"_events":{},"_maxListeners":10}}

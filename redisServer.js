@@ -9,25 +9,6 @@ if (process.env.REDISCLOUD_URL) {
     var redis = require('redis').createClient();
 }
 
-//addTweet(tweetData,'sick');
-function addTweet(tweetData, type) {
-    if (type === 'sick') {
-        redis.zadd('sick',tweetData.id,tweetData.text);
-    } else if (type === 'not') {
-        redis.zadd('not',tweetData.id,tweetData.text);
-    } else {
-        redis.zadd('dono',tweetData.id,tweetData.text);
-    }
-}
-
-function getTweets(type, min, max) {
-    redis.zrangebyscore([type,min,max], function(err, res) {
-        console.log(res);
-    });
-}
-
 module.exports = {
-    redis: redis,
-    addTweet: addTweet,
-    getTweets: getTweets
+    redis: redis
 };
