@@ -85,7 +85,7 @@ function addTweet(tweetData, type) {
         classifier.addDocument(tweetData.text, 'not');
         classifyCount++;
     }
-    if (classifyCount >= 100) {
+    if (classifyCount >= 10) {
         classifier.train();
         classifyCount = 0;
         classifier.save('classifier.json', function(err, classifier) {
@@ -134,7 +134,7 @@ function getStream() {
                         console.log(type + ' ' + tweetData.text);
                         if (type === 'sick') {
                             io.sockets.volatile.emit('getTweet', tweetData);
-                            redisServer.zadd(tweetData.state, Date.now(), tweetData.text);
+                            //redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
                         }
                     }
                 }
