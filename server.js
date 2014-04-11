@@ -5,6 +5,7 @@ var twitter = require('ntwitter');
 dotenv.load();
 
 var redisServer = require('./redisServer.js').redis;
+var ts = require('./redisServer.js').ts;
 var express = require('express');
 var app     = express();
 var server  = require('http').createServer(app);
@@ -94,11 +95,11 @@ function addTweet(tweetData, type) {
     }
 }
 
-function getTweets(type, min, max) {
-    redisServer.zrangebyscore([type,min,max], function(err, res) {
-        console.log(res);
-    });
-}
+// function getTweets(type, min, max) {
+//     redisServer.zrangebyscore([type,min,max], function(err, res) {
+//         console.log(res);
+//     });
+// }
 
 io.sockets.on('connection', function (socket) {
     socket.emit('updated_states');
@@ -107,9 +108,9 @@ io.sockets.on('connection', function (socket) {
         addTweet(tweet, type);
     });
 
-    socket.on('getTweets', function() {
-        getTweets('sick','-inf','+inf');
-    });
+    // socket.on('getTweets', function() {
+    //     getTweets('sick','-inf','+inf');
+    // });
 });
 
 var tweetStream;
@@ -135,6 +136,7 @@ function getStream() {
                         if (type === 'sick') {
                             io.sockets.volatile.emit('getTweet', tweetData);
                             //redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
+                            ts.recordHit(state);
                         }
                     }
                 }
