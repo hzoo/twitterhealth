@@ -8,7 +8,8 @@
     "dotenv": "~0.2.5",
     "express": "~3.5.0",
     "socket.io": "~0.9.16",
-    "natural": "~0.1.27"
+    "natural": "~0.1.27",
+    "redis-timeseries": "~0.4.0"
   },
   "scripts": {
     "start": "node server.js"
