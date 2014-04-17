@@ -216,8 +216,12 @@ function getStream() {
                 console.log(info.error);    // The error causing reconnection
                 console.log(info.attempts); // Number of reconnects attempted
             });
-            stream.on('end', function(respone) {
-                console.log('stream end: ' + respone);
+            stream.on('end', function(response) {
+                console.log('stream end: ' + response);
+                for (obj in response) {
+                    console.log(response[obj]);
+                }
+                setTimeout(getStream, 5000);
             });
             stream.on('destroy', function(response) {
                 console.log('stream destroy: ' + response);
