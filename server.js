@@ -218,9 +218,6 @@ function getStream() {
             });
             stream.on('end', function(response) {
                 console.log('stream end: ' + response);
-                for (obj in response) {
-                    console.log(response[obj]);
-                }
                 setTimeout(getStream, 5000);
             });
             stream.on('destroy', function(response) {
