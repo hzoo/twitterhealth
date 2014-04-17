@@ -66,6 +66,7 @@ var trackWords = [
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
+var last5Tweets = [];
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -114,6 +115,8 @@ function createHandler(command, count, granularityLabel) {
 }
 
 io.sockets.on('connection', function (socket) {
+    socket.emit('last5Tweets', last5Tweets);
+
     socket.on('classfyTweet', function(type, tweet) {
         addTweet(tweet, type);
     });
@@ -185,6 +188,10 @@ function getStream() {
                                         return a + b;
                                     });
                                     io.sockets.volatile.emit('getTweet', tweetData, temp);
+                                    last5Tweets.push(tweetData);
+                                    if (last5Tweets.length >= 6) {
+                                        last5Tweets.shift();
+                                    }
                                 }
                             });
                             // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);

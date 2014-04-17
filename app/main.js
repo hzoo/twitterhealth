@@ -145,6 +145,25 @@ function displayTweet(tweet) {
     twttr.widgets.load();
 }
 
+function showTweets() {
+    if (!isTweetDisplayed) {
+        isTweetDisplayed = true;
+        $('.buttons').removeClass('hidden');
+        $('#tweet').removeClass('hidden');
+        $('.tweet-box').addClass('hidden');
+        $('.buttons').children().removeClass('disabled');
+        if (tweetQueue.length > 0) {
+            tweet = tweetQueue.shift();
+        }
+        displayTweet(tweet);
+    }
+}
+
+socket.on('last5Tweets', function(sentData){
+    tweetQueue = sentData;
+    showTweets();
+});
+
 socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
     var state = sentData.state;
@@ -196,17 +215,7 @@ socket.on('getTweet', function (sentData, tweets15min) {
     updatePoints(tweetLocations);
     d3.timer.flush();
 
-    if (!isTweetDisplayed) {
-        isTweetDisplayed = true;
-        $('.buttons').removeClass('hidden');
-        $('#tweet').removeClass('hidden');
-        $('.tweet-box').addClass('hidden');
-        $('.buttons').children().removeClass('disabled');
-        if (tweetQueue.length > 0) {
-            tweet = tweetQueue.shift();
-        }
-        displayTweet(tweet);
-    }
+    showTweets();
 });
 
 var stateArray = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
@@ -245,6 +254,7 @@ socket.on('history2', function(data){
                 return color(percentDiff);
             });
 });
+
 function onButtonClick() {
     if (tweetQueue.length <= 1) {
         isTweetDisplayed = false;
