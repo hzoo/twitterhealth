@@ -95,6 +95,7 @@ d3.json('us-named.json', function(error, us) {
         .attr('id', function(d) { return d.properties.name;})
         .on('click', clicked);
 
+    isInitialized = true;
     socket.emit('getPastTweets');
 });
 
