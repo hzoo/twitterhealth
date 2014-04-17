@@ -32,6 +32,20 @@ app.use('/', express.static(__dirname + '/app'));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(express.compress());
 
+app.configure('production', function(){
+    //reduce console logs
+    io.set('log level', 0);
+    io.enable('browser client minification');  // send minified client
+    io.enable('browser client etag');          // apply etag caching logic based on version number
+    io.enable('browser client gzip');          // gzip the file
+    io.set('transports', [
+        'websocket',
+        'htmlfile',
+        'xhr-polling',
+        'jsonp-polling'
+    ]);
+});
+
 //twitter
 var t = new twitter({
     consumer_key:         process.env.CONSUMER_KEY,
@@ -99,15 +113,7 @@ function createHandler(command, count, granularityLabel) {
     };
 }
 
-// function getTweets(type, min, max) {
-//     redisServer.zrangebyscore([type,min,max], function(err, res) {
-//         console.log(res);
-//     });
-// }
-
 io.sockets.on('connection', function (socket) {
-    socket.emit('initialize');
-
     socket.on('classfyTweet', function(type, tweet) {
         addTweet(tweet, type);
     });
@@ -143,20 +149,9 @@ io.sockets.on('connection', function (socket) {
                 }), function(err, data) {
                         socket.emit('history2', data);
                     });
-            // setInterval(function() {
-            //     async.parallel(states.map(
-            //         function(cmd) {
-            //             return tss.createHandler(cmd, 1, granularityLabel);
-            //         }), function(err, data) {
-            //                 socket.emit('realtime',data);
-            //             });
-            // }, granularityDuration*1000);
         }
     });
 
-    // socket.on('getTweets', function() {
-    //     getTweets('sick','-inf','+inf');
-    // });
 });
 
 var tweetStream;
@@ -193,14 +188,16 @@ function getStream() {
                                 }
                             });
                             // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
-                            ts.recordHit(state).exec();
+                            if (app.settings.env === 'production') {
+                                ts.recordHit(state).exec();
+                            }
                         }
                     }
                 }
             });
 
-            stream.on('error', function(tweet) {
-                console.log('stream err: ' + tweet);
+            stream.on('error', function(error, data) {
+                console.log('stream err: ', error, data);
             });
             stream.on('end', function(tweet) {
                 console.log('stream end: ' + tweet);
@@ -215,19 +212,4 @@ function getStream() {
 classifier = natural.BayesClassifier.restore(
     JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
 
-app.configure('production', function(){
-    //reduce console logs
-    io.set('log level', 0);
-    io.enable('browser client minification');  // send minified client
-    io.enable('browser client etag');          // apply etag caching logic based on version number
-    io.enable('browser client gzip');          // gzip the file
-    io.set('transports', [
-        'websocket',
-        'htmlfile',
-        'xhr-polling',
-        'jsonp-polling'
-    ]);
-
-    //only call in production
-    getStream();
-});
+getStream();
