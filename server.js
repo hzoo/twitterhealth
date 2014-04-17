@@ -3,6 +3,7 @@ var fs = require('fs');
 var dotenv = require('dotenv');
 var Twat = require('twat');
 var async = require('async');
+var Firebase = require('firebase');
 dotenv.load();
 
 var redisServer = require('./redisServer.js').redis;
@@ -66,7 +67,11 @@ var trackWords = [
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
-var last5Tweets = [];
+var nTweets = 2+1;
+var lastNTweets = [];
+
+var tweetsRoot = new Firebase('https://twitterhealth.firebaseio.com/');
+var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -85,17 +90,20 @@ function getTweetInfo(tweet, state) {
 function addTweet(tweetData, type) {
     if (type === 'sick') {
         classifier.addDocument(tweetData.text, 'sick');
+        tweetsRoot.child('tweets').child('sick').push(tweetData);
         classifyCount++;
     } else if (type === 'not') {
         classifier.addDocument(tweetData.text, 'not');
+        tweetsRoot.child('tweets').child('not').push(tweetData);
         classifyCount++;
     }
-    if (classifyCount >= 10) {
+    if (classifyCount >= 5) {
         classifier.train();
         classifyCount = 0;
-        classifier.save('classifier.json', function(err, classifier) {
-            console.log('saved classifier');
-        });
+        classifierRoot.set(JSON.stringify(classifier));
+        // classifier.save('classifier.json', function(err, classifier) {
+        //     console.log('saved classifier');
+        // });
     }
 }
 
@@ -115,7 +123,7 @@ function createHandler(command, count, granularityLabel) {
 }
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('last5Tweets', last5Tweets);
+    socket.emit('lastNTweets', lastNTweets);
 
     socket.on('classfyTweet', function(type, tweet) {
         addTweet(tweet, type);
@@ -186,9 +194,9 @@ function getStream() {
                                         return a + b;
                                     });
                                     io.sockets.volatile.emit('getTweet', tweetData, temp);
-                                    last5Tweets.push(tweetData);
-                                    if (last5Tweets.length >= 6) {
-                                        last5Tweets.shift();
+                                    lastNTweets.push(tweetData);
+                                    if (lastNTweets.length >= nTweets) {
+                                        lastNTweets.shift();
                                     }
                                 }
                             });
@@ -218,7 +226,15 @@ function getStream() {
     );
 }
 
-classifier = natural.BayesClassifier.restore(
-    JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
+// classifier = natural.BayesClassifier.restore(
+//     JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
 
-getStream();
+classifierRoot.on('value', function(snapshot) {
+    var val = JSON.parse(snapshot.val());
+    classifier = natural.BayesClassifier.restore(val);
+    // classifier.addDocument('i hate being sick', 'sick');
+    // classifier.addDocument('sick of', 'not');
+    // classifier.train();
+    // classifierRoot.set(JSON.stringify(classifier));
+    getStream();
+});

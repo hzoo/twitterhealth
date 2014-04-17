@@ -91,7 +91,7 @@ d3.json('us-named.json', function(error, us) {
         .enter().append('path')
         .attr('d', path)
         .attr('class', 'state')
-        .attr('id', function(d) { return d.properties.name;})
+        .attr('id', function(d) { return d.properties.code;})
         .on('click', clicked);
 
     socket.emit('getPastTweets');
@@ -154,8 +154,8 @@ function showTweets() {
         $('.buttons').children().removeClass('disabled');
         if (tweetQueue.length > 0) {
             tweet = tweetQueue.shift();
+            displayTweet(tweet);
         }
-        displayTweet(tweet);
     }
 }
 
@@ -182,24 +182,12 @@ socket.on('getTweet', function (sentData, tweets15min) {
     // }))]);
     // color.domain(colorRange);
 
-    states.selectAll('path')
+    states.select('#'+state)
         .transition()
-          .duration(500)
-          .style('fill', function(d) {
-                if (d.properties.code === state) {
-                    console.log();
-                    if (tweetAverages[state] !== 0) {
-                        var percentDiff = (tweets15min - tweetAverages[state])/tweetAverages[state];
-                    } else {
-                        var percentDiff = 0;
-                    }
-                    // console.log(percentDiff);
-                    // console.log(d3.select(this).style('fill'), color(percentDiff));
-                    return color(percentDiff);
-                } else {
-                    return d3.select(this).style('fill');
-                }
-            });
+        .duration(500)
+        .style('fill', function() {
+            return color(3);
+        });
 
     if (tweetLocations.length >= 100) {
         tweetLocations.shift();
