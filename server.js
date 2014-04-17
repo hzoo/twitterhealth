@@ -120,9 +120,28 @@ io.sockets.on('connection', function (socket) {
             async.parallel(states.map(
                 function(cmd) {
                     // return createHandler(cmd, 1344, granularityLabel);
-                    return createHandler(cmd, 3, granularityLabel);
+                    return createHandler(cmd, 6, granularityLabel);
                 }), function(err, data) {
-                        socket.emit('history',data);
+                        socket.emit('history', data);
+                    });
+            async.parallel(states.map(
+                function(cmd) {
+                    return function(callback) {
+                        ts.getHits(cmd, '1second', 900, function(err, data) {
+                            if (err) {
+                                console.log('err: ' + err);
+                            } else {
+                                var temp = data.map(function(data) {
+                                    return data[1];
+                                }).reduce(function(a, b) {
+                                    return a + b;
+                                });
+                                callback(null, temp);
+                            }
+                        });
+                    }
+                }), function(err, data) {
+                        socket.emit('history2', data);
                     });
             // setInterval(function() {
             //     async.parallel(states.map(
@@ -173,7 +192,7 @@ function getStream() {
                                     io.sockets.volatile.emit('getTweet', tweetData, temp);
                                 }
                             });
-                            //redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
+                            // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
                             ts.recordHit(state).exec();
                         }
                     }

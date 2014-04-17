@@ -35,11 +35,12 @@ var states = svg.append('g')
     .attr('class', 'states');
 
 var color = d3.scale.linear()
-    .range(['#f7fbff','#08306b']);
+    .range(["#f1a340","#f7f7f7","#998ec3"]);
 
 var isTweetDisplayed = false;
 var tweet;
 var tweetQueue = [];
+var colorRange = [-3,0,3];
 
 $(window).resize(function() {
     var w = $("#chart").width();
@@ -131,7 +132,7 @@ function initialize() {
     d3.timer.flush();
     tweetDensity = getResetStates();
 
-    color.domain([0, 1]);
+    color.domain(colorRange);
 
     states.selectAll('path')
         .transition()
@@ -183,15 +184,28 @@ socket.on('getTweet', function (sentData, tweets15min) {
             text: sentData.text
         });
 
-        color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
-            return v.length;
-        }))]);
+        // color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
+        //     return v.length;
+        // }))]);
+        color.domain(colorRange);
 
         states.selectAll('path')
             .transition()
               .duration(500)
               .style('fill', function(d) {
-                    return color(tweetDensity[d.properties.code].length/pop[d.properties.code]);
+                    if (d.properties.code === state) {
+                        console.log();
+                        if (tweetAverages[state] !== 0) {
+                            var percentDiff = (tweets15min - tweetAverages[state])/tweetAverages[state];
+                        } else {
+                            var percentDiff = 0;
+                        }
+                        // console.log(percentDiff);
+                        // console.log(d3.select(this).style('fill'), color(percentDiff));
+                        return color(percentDiff);
+                    } else {
+                        return d3.select(this).style('fill');
+                    }
                 });
 
         if (tweetLocations.length >= 100) {
@@ -224,31 +238,40 @@ socket.on('getTweet', function (sentData, tweets15min) {
 
 var stateArray = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
 var tweetAverages = {};
+var tweets15min = {};
 socket.on('history', function(data){
-    // console.log(data);
+    console.log('history:',data);
     for (var i = 0; i < data.length; i++) {
         tweetDensity[stateArray[i]] = data[i];
     }
-
+});
+socket.on('history2', function(data){
     for (state in tweetDensity) {
         tweetAverages[state] = tweetDensity[state].reduce(function(a,b){
             return a + b;
         },0)/tweetDensity[state].length;
     }
-    // console.log(tweetAverages);
+    console.log('history2: ',data);
+    console.log('history2: ',tweetAverages);
+
     //update choropleth
-    color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
-        return v.length;
-    }))]);
+    color.domain(colorRange);
 
     states.selectAll('path')
         .transition()
           .duration(500)
-          .style('fill', function(d) {
-                return color(tweetDensity[d.properties.code].length/pop[d.properties.code]);
+          .style('fill', function(d, i) {
+                var state = d.properties.code;
+                if (tweetAverages[state] !== 0) {
+                    var percentDiff = (data[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
+                    // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
+                } else {
+                    var percentDiff = 0;
+                }
+                // console.log(percentDiff);
+                return color(percentDiff);
             });
 });
-
 function onButtonClick() {
     if (tweetQueue.length <= 1) {
         isTweetDisplayed = false;
