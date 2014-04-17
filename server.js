@@ -1,7 +1,7 @@
 //packages
 var fs = require('fs');
 var dotenv = require('dotenv');
-var twitter = require('ntwitter');
+var Twat = require('twat');
 var async = require('async');
 dotenv.load();
 
@@ -47,10 +47,10 @@ app.configure('production', function(){
 });
 
 //twitter
-var t = new twitter({
+var twit = new Twat({
     consumer_key:         process.env.CONSUMER_KEY,
     consumer_secret:      process.env.CONSUMER_SECRET,
-    access_token_key:     process.env.ACCESS_TOKEN,
+    access_token:     process.env.ACCESS_TOKEN,
     access_token_secret:  process.env.ACCESS_TOKEN_SECRET
 });
 
@@ -157,16 +157,14 @@ io.sockets.on('connection', function (socket) {
 
 });
 
-var tweetStream;
 function getStream() {
     'use strict';
-    t.stream(
+    twit.stream(
         'statuses/filter',
         { track: trackWords },
         // {'locations': ['-180','15','19','72']}, //usa
         function(stream) {
-            tweetStream = stream;
-            stream.on('data', function(tweet) {
+            stream.on('tweet', function(tweet) {
                 if (tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
                     var state = tweet.place.full_name.split(',')[1];
                     if (state) {
@@ -206,11 +204,15 @@ function getStream() {
             stream.on('error', function(error, data) {
                 console.log('stream err: ', error, data);
             });
-            stream.on('end', function(tweet) {
-                console.log('stream end: ' + tweet);
+            stream.on('reconnect', function(info) {
+                console.log(info.error);    // The error causing reconnection
+                console.log(info.attempts); // Number of reconnects attempted
             });
-            stream.on('destroy', function(tweet) {
-                console.log('stream destroy: ' + tweet);
+            stream.on('end', function(respone) {
+                console.log('stream end: ' + respone);
+            });
+            stream.on('destroy', function(response) {
+                console.log('stream destroy: ' + response);
             });
         }
     );
