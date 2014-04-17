@@ -4,7 +4,6 @@ if (location.host.split(':')[0] === 'localhost') {
 } else {
     var socket = io.connect(location.host);
 }
-var isInitialized = false;
 var width      = 960;
 var height     = 500;
 var mWidth = $('#chart').width();
@@ -95,7 +94,6 @@ d3.json('us-named.json', function(error, us) {
         .attr('id', function(d) { return d.properties.name;})
         .on('click', clicked);
 
-    isInitialized = true;
     socket.emit('getPastTweets');
 });
 
@@ -126,7 +124,7 @@ function updatePoints(data) {
         .remove();
 }
 
-function reset() {
+function resetMap() {
     //reset
     tweetLocations = [];
     updatePoints([]);
@@ -137,22 +135,7 @@ function reset() {
         .transition()
         .duration(500)
         .style('fill', color(0));
-    isInitialized = true;
 }
-
-// function wordMatches(text,words) {
-//     if (words.length === 0) {
-//         return false;
-//     }
-//     for (var i = 0;i < words.length; i++) {
-//         var textLC = text.toLowerCase();
-//         var wordsLC = words[i].toLowerCase();
-//         if (textLC.indexOf(wordsLC + ' ') !== -1 || textLC.indexOf(wordsLC + '.') !== -1 || textLC.indexOf('#' + wordsLC) !== -1) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
 
 function displayTweet(tweet) {
     var html =
@@ -164,68 +147,65 @@ function displayTweet(tweet) {
 
 socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
+    var state = sentData.state;
+    // tweetDensity[state] += 1/pop[state];
+    tweetDensity[state].push({
+        id: sentData.id,
+        text: sentData.text
+    });
+    tweetQueue.push({
+        id: sentData.id,
+        text: sentData.text
+    });
 
-    if (isInitialized) {// && wordMatches(sentData.text,words) === true) {
-        var state = sentData.state;
-        // tweetDensity[state] += 1/pop[state];
-        tweetDensity[state].push({
-            id: sentData.id,
-            text: sentData.text
-        });
-        tweetQueue.push({
-            id: sentData.id,
-            text: sentData.text
-        });
+    // color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
+    //     return v.length;
+    // }))]);
+    // color.domain(colorRange);
 
-        // color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
-        //     return v.length;
-        // }))]);
-        color.domain(colorRange);
-
-        states.selectAll('path')
-            .transition()
-              .duration(500)
-              .style('fill', function(d) {
-                    if (d.properties.code === state) {
-                        console.log();
-                        if (tweetAverages[state] !== 0) {
-                            var percentDiff = (tweets15min - tweetAverages[state])/tweetAverages[state];
-                        } else {
-                            var percentDiff = 0;
-                        }
-                        // console.log(percentDiff);
-                        // console.log(d3.select(this).style('fill'), color(percentDiff));
-                        return color(percentDiff);
+    states.selectAll('path')
+        .transition()
+          .duration(500)
+          .style('fill', function(d) {
+                if (d.properties.code === state) {
+                    console.log();
+                    if (tweetAverages[state] !== 0) {
+                        var percentDiff = (tweets15min - tweetAverages[state])/tweetAverages[state];
                     } else {
-                        return d3.select(this).style('fill');
+                        var percentDiff = 0;
                     }
-                });
+                    // console.log(percentDiff);
+                    // console.log(d3.select(this).style('fill'), color(percentDiff));
+                    return color(percentDiff);
+                } else {
+                    return d3.select(this).style('fill');
+                }
+            });
 
-        if (tweetLocations.length >= 100) {
-            tweetLocations.shift();
+    if (tweetLocations.length >= 100) {
+        tweetLocations.shift();
+    }
+
+    tweetLocations.push({
+        id: sentData.id,
+        abbr: sentData.state,
+        // place_name: sentData.place_name,
+        coord: projection(sentData.coordinates)
+    });
+
+    updatePoints(tweetLocations);
+    d3.timer.flush();
+
+    if (!isTweetDisplayed) {
+        isTweetDisplayed = true;
+        $('.buttons').removeClass('hidden');
+        $('#tweet').removeClass('hidden');
+        $('.tweet-box').addClass('hidden');
+        $('.buttons').children().removeClass('disabled');
+        if (tweetQueue.length > 0) {
+            tweet = tweetQueue.shift();
         }
-
-        tweetLocations.push({
-            id: sentData.id,
-            abbr: sentData.state,
-            // place_name: sentData.place_name,
-            coord: projection(sentData.coordinates)
-        });
-
-        updatePoints(tweetLocations);
-        d3.timer.flush();
-
-        if (!isTweetDisplayed) {
-            isTweetDisplayed = true;
-            $('.buttons').removeClass('hidden');
-            $('#tweet').removeClass('hidden');
-            $('.tweet-box').addClass('hidden');
-            $('.buttons').children().removeClass('disabled');
-            if (tweetQueue.length > 0) {
-                tweet = tweetQueue.shift();
-            }
-            displayTweet(tweet);
-        }
+        displayTweet(tweet);
     }
 });
 
