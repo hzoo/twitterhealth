@@ -139,9 +139,10 @@ function initialize() {
         .style('fill', color(0));
 
     isInitialized = true;
+    socket.emit('getPastTweets');
 }
 
-socket.on('updated_states', function () {
+socket.on('initialize', function () {
     initialize();
 });
 
@@ -167,7 +168,7 @@ function displayTweet(tweet) {
     twttr.widgets.load();
 }
 
-socket.on('getTweet', function (sentData) {
+socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
 
     if (isInitialized) {// && wordMatches(sentData.text,words) === true) {
@@ -184,13 +185,13 @@ socket.on('getTweet', function (sentData) {
 
         color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
             return v.length;
-        }))/pop[state]]);
+        }))]);
 
         states.selectAll('path')
             .transition()
               .duration(500)
               .style('fill', function(d) {
-                    return color(tweetDensity[d.properties.code].length/pop[state]);
+                    return color(tweetDensity[d.properties.code].length/pop[d.properties.code]);
                 });
 
         if (tweetLocations.length >= 100) {
@@ -219,6 +220,33 @@ socket.on('getTweet', function (sentData) {
             displayTweet(tweet);
         }
     }
+});
+
+var stateArray = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
+var tweetAverages = {};
+socket.on('history', function(data){
+    // console.log(data);
+    for (var i = 0; i < data.length; i++) {
+        tweetDensity[stateArray[i]] = data[i];
+    }
+
+    for (state in tweetDensity) {
+        tweetAverages[state] = tweetDensity[state].reduce(function(a,b){
+            return a + b;
+        },0)/tweetDensity[state].length;
+    }
+    // console.log(tweetAverages);
+    //update choropleth
+    color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
+        return v.length;
+    }))]);
+
+    states.selectAll('path')
+        .transition()
+          .duration(500)
+          .style('fill', function(d) {
+                return color(tweetDensity[d.properties.code].length/pop[d.properties.code]);
+            });
 });
 
 function onButtonClick() {

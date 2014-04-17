@@ -2,6 +2,7 @@
 var fs = require('fs');
 var dotenv = require('dotenv');
 var twitter = require('ntwitter');
+var async = require('async');
 dotenv.load();
 
 var redisServer = require('./redisServer.js').redis;
@@ -31,20 +32,6 @@ app.use('/', express.static(__dirname + '/app'));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(express.compress());
 
-app.configure('production', function(){
-    //reduce console logs
-    io.set('log level', 0);
-    io.enable('browser client minification');  // send minified client
-    io.enable('browser client etag');          // apply etag caching logic based on version number
-    io.enable('browser client gzip');          // gzip the file
-    io.set('transports', [
-        'websocket',
-        'htmlfile',
-        'xhr-polling',
-        'jsonp-polling'
-    ]);
-});
-
 //twitter
 var t = new twitter({
     consumer_key:         process.env.CONSUMER_KEY,
@@ -63,6 +50,8 @@ var trackWords = [
     //medicine
     'meds', 'medicine'
 ];
+
+var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -95,6 +84,21 @@ function addTweet(tweetData, type) {
     }
 }
 
+function createHandler(command, count, granularityLabel) {
+    return function(callback) {
+        ts.getHits(command, granularityLabel, count, function(err, data) {
+            if (err) {
+                console.log('err: ' + err);
+            } else {
+                var temp = data.map(function(data) {
+                        return data[1];
+                    });
+                callback(null, temp);
+            }
+        });
+    };
+}
+
 // function getTweets(type, min, max) {
 //     redisServer.zrangebyscore([type,min,max], function(err, res) {
 //         console.log(res);
@@ -102,10 +106,33 @@ function addTweet(tweetData, type) {
 // }
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('updated_states');
+    socket.emit('initialize');
 
     socket.on('classfyTweet', function(type, tweet) {
         addTweet(tweet, type);
+    });
+
+    socket.on('getPastTweets', function(data){
+        var granularityLabel = '15minutes';//data.step;
+        if (ts.granularities.hasOwnProperty(granularityLabel)) {
+            var granularityDuration = ts.granularities[granularityLabel].duration;
+            // console.log(granularityLabel,granularityDuration);
+            async.parallel(states.map(
+                function(cmd) {
+                    // return createHandler(cmd, 1344, granularityLabel);
+                    return createHandler(cmd, 3, granularityLabel);
+                }), function(err, data) {
+                        socket.emit('history',data);
+                    });
+            // setInterval(function() {
+            //     async.parallel(states.map(
+            //         function(cmd) {
+            //             return tss.createHandler(cmd, 1, granularityLabel);
+            //         }), function(err, data) {
+            //                 socket.emit('realtime',data);
+            //             });
+            // }, granularityDuration*1000);
+        }
     });
 
     // socket.on('getTweets', function() {
@@ -134,9 +161,20 @@ function getStream() {
                         var type = classifier.classify(tweetData.text);
                         console.log(type + ' ' + tweetData.text);
                         if (type === 'sick') {
-                            io.sockets.volatile.emit('getTweet', tweetData);
+                            ts.getHits(state, '1second', 900, function(err, data) {
+                                if (err) {
+                                    console.log('err: ' + err);
+                                } else {
+                                    var temp = data.map(function(data) {
+                                        return data[1];
+                                    }).reduce(function(a, b) {
+                                        return a + b;
+                                    });
+                                    io.sockets.volatile.emit('getTweet', tweetData, temp);
+                                }
+                            });
                             //redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
-                            ts.recordHit(state);
+                            ts.recordHit(state).exec();
                         }
                     }
                 }
@@ -157,4 +195,20 @@ function getStream() {
 
 classifier = natural.BayesClassifier.restore(
     JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
-getStream();
+
+app.configure('production', function(){
+    //reduce console logs
+    io.set('log level', 0);
+    io.enable('browser client minification');  // send minified client
+    io.enable('browser client etag');          // apply etag caching logic based on version number
+    io.enable('browser client gzip');          // gzip the file
+    io.set('transports', [
+        'websocket',
+        'htmlfile',
+        'xhr-polling',
+        'jsonp-polling'
+    ]);
+
+    //only call in production
+    getStream();
+});

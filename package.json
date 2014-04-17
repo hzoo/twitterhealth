@@ -9,7 +9,8 @@
     "express": "~3.5.0",
     "socket.io": "~0.9.16",
     "natural": "~0.1.27",
-    "redis-timeseries": "~0.4.0"
+    "redis-timeseries": "~0.4.0",
+    "async": "~0.7.0"
   },
   "scripts": {
     "start": "node server.js"
