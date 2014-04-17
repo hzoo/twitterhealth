@@ -159,7 +159,7 @@ function showTweets() {
     }
 }
 
-socket.on('last5Tweets', function(sentData){
+socket.on('lastNTweets', function(sentData){
     tweetQueue = sentData;
     showTweets();
 });
