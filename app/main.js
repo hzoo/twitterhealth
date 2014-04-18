@@ -166,13 +166,44 @@ socket.on('lastNTweets', function(sentData){
 
 socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
-    var state = sentData.state;
-    // tweetDensity[state] += 1/pop[state];
-    tweetDensity[state].push({
-        id: sentData.id,
-        text: sentData.text
-    });
 
+    //if tweet is categorized sick by algorithm
+    if (tweets15min !== undefined) {
+        states.selectAll('path')
+        .transition()
+          .duration(500)
+          .style('fill', function(d, i) {
+                var state = d.properties.code;
+                if (tweetAverages[state] !== 0) {
+                    var percentDiff = (tweets15min[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
+                    // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
+                } else {
+                    var percentDiff = 0;
+                }
+                // console.log(percentDiff);
+                return color(percentDiff);
+            });
+
+        var state = sentData.state;
+
+        tweetDensity[state][state.length - 1]++;
+
+        if (tweetLocations.length >= 100) {
+            tweetLocations.shift();
+        }
+
+        tweetLocations.push({
+            id: sentData.id,
+            abbr: sentData.state,
+            // place_name: sentData.place_name,
+            coord: projection(sentData.coordinates)
+        });
+
+        updatePoints(tweetLocations);
+        d3.timer.flush();
+    }
+
+    //show tweet regardless if categorized as sick or not
     if (tweetQueue.length === 0 || tweetQueue[tweetQueue.length-1].id !== sentData.id) {
         tweetQueue.push({
             id: sentData.id,
@@ -180,43 +211,30 @@ socket.on('getTweet', function (sentData, tweets15min) {
         });
     }
 
-    // color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
-    //     return v.length;
-    // }))]);
-    // color.domain(colorRange);
-
-    states.select('#'+state)
-        .transition()
-        .duration(500)
-        .style('fill', function() {
-            return color(3);
-        });
-
-    if (tweetLocations.length >= 100) {
-        tweetLocations.shift();
-    }
-
-    tweetLocations.push({
-        id: sentData.id,
-        abbr: sentData.state,
-        // place_name: sentData.place_name,
-        coord: projection(sentData.coordinates)
-    });
-
-    updatePoints(tweetLocations);
-    d3.timer.flush();
-
     showTweets();
 });
 
 var stateArray = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
 var tweetAverages = {};
 var tweets15min = {};
+var mainTimeline;
+var total = [];
+
 socket.on('history', function(data){
     console.log('history:',data);
     for (var i = 0; i < data.length; i++) {
         tweetDensity[stateArray[i]] = data[i];
     }
+
+    // var numHistory = tweetDensity[stateArray[0]].length;
+    // for (var i = 0; i < numHistory; i++) {
+    //     var tempTotal = 0;
+    //     for (state in tweetDensity) {
+    //         tempTotal += tweetDensity[state][i];
+    //     }
+    //     total.push([tempTotal]);
+    // }
+
 });
 socket.on('history2', function(data){
     for (state in tweetDensity) {
@@ -244,6 +262,12 @@ socket.on('history2', function(data){
                 // console.log(percentDiff);
                 return color(percentDiff);
             });
+
+    setInterval(function() {
+        stateArray.forEach(function(state){
+            tweetDensity[state].push(0);
+        });
+    }, 900000);
 });
 
 function onButtonClick() {
@@ -260,17 +284,20 @@ function onButtonClick() {
 }
 
 $('.btn-primary').click(function() {
-    socket.emit('classfyTweet', 'sick', tweet);
+    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+    socket.emit('classifyTweet', 'sick', tweet);
     onButtonClick();
 });
 
 $('.btn-danger').click(function() {
-    socket.emit('classfyTweet', 'not', tweet);
+    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+    socket.emit('classifyTweet', 'not', tweet);
     onButtonClick();
 });
 
 $('.btn-warning').click(function() {
-    socket.emit('classfyTweet', 'dono', tweet);
+    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+    socket.emit('classifyTweet', 'dono', tweet);
     onButtonClick();
 });
 

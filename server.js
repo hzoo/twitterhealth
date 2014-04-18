@@ -66,13 +66,19 @@ app.configure('production', function(){
 
 //variables
 var trackWords = [
-    //generic
-    'sick','sinus','painful',
-    //symptoms
-    'runny nose','sore throat','chills','headache','allergy','inflammation',
-    'fever','flu','infection','ache','insomnia',
-    //medicine
-    'meds', 'medicine'
+    'infective','contagious','catching','rampant','prevailing','pandemic',
+    'run down','infected','ailing','ill','feeble','in poor health',
+    'under the weather','unwell','weak','lousy','queasy','impaired',
+    'sweat','incurable','down','help','health','disease','temperature',
+    'rotten','terrible','wreck','run-down','bummed','doctor',
+    'feeling','pain','cold','cry','hospital','ache','medicine','allergic',
+    'depression','hurt','blood','meds','flu','sneezing','cough','aches',
+    'pressure','sore','treatment','surgery',
+    'antibiotics','virus','sick','sinus','painful','runny nose','chills',
+    'headache','allergy','inflammation','fever','infection','toothache',
+    'tumor','fractured','burn','vomiting','i feel','worthless',
+    'like crap','like shit','crappy','shitty','horrible','fml','tired'
+    //'hot','sucked'
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
@@ -135,7 +141,7 @@ function createHandler(command, count, granularityLabel) {
 }
 
 io.sockets.on('connection', function (socket) {
-    socket.on('classfyTweet', function(type, tweet) {
+    socket.on('classifyTweet', function(type, tweet) {
         addTweet(tweet, type);
     });
 
@@ -183,7 +189,8 @@ function getStream() {
         // {'locations': ['-180','15','19','72']}, //usa
         function(stream) {
             stream.on('tweet', function(tweet) {
-                if (tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
+                //filter out urls and tweets geocoded in usa
+                if ((!tweet.entities || tweet.entities.urls.length === 0) && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
                     var state = tweet.place.full_name.split(',')[1];
                     if (state) {
                         state = state.trim();
@@ -192,24 +199,33 @@ function getStream() {
                     if (state !== undefined && state !== 'US' && state.length === 2) {
                         var tweetData = getTweetInfo(tweet,state);
                         var type = classifier.classify(tweetData.text);
-                        console.log(type + ' ' + tweetData.text);
                         if (type === 'sick') {
-                            ts.getHits(state, '1second', 900, function(err, data) {
-                                if (err) {
-                                    console.log('err: ' + err);
-                                } else {
-                                    var temp = data.map(function(data) {
-                                        return data[1];
-                                    }).reduce(function(a, b) {
-                                        return a + b;
+                            console.log(type + ' ' + tweetData.text);
+                            async.parallel(states.map(
+                                function(cmd) {
+                                    return function(callback) {
+                                        ts.getHits(cmd, '1second', 900, function(err, data) {
+                                            if (err) {
+                                                console.log('err: ' + err);
+                                            } else {
+                                                var temp = data.map(function(data) {
+                                                    return data[1];
+                                                }).reduce(function(a, b) {
+                                                    return a + b;
+                                                });
+                                                callback(null, temp);
+                                            }
+                                        });
+                                    }
+                                }), function(err, data) {
+                                        io.sockets.volatile.emit('getTweet', tweetData, data);
                                     });
-                                    io.sockets.volatile.emit('getTweet', tweetData, temp);
-                                }
-                            });
                             // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
                             if (app.settings.env === 'production') {
                                 ts.recordHit(state).exec();
                             }
+                        } else {
+                            io.sockets.volatile.emit('getTweet', tweetData);
                         }
                     }
                 }
