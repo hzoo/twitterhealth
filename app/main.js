@@ -67,7 +67,9 @@ function clicked(d) {
     if (active.node() === this) {
         return reset();
     }
-    startGraph(d.properties.code, '#stateTimeline');
+    if (window.innerWidth > 768) {
+        startGraph(d.properties.code, '#stateTimeline');
+    }
     active.classed('active', false);
     active = d3.select(this).classed('active', true);
 
@@ -355,7 +357,9 @@ socket.on('history', function(data){
     }
 
     $('#instructions').removeClass('hidden');
-    startGraph('all', '#mainTimeline');
+    if (window.innerWidth > 768) {
+        startGraph('all', '#mainTimeline');
+    }
 });
 
 socket.on('history2', function(data){
