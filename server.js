@@ -233,17 +233,11 @@ function getStream() {
 
     stream.on('error', function(error, data) {
         console.log('stream err: ', error, data);
-    });
-    stream.on('reconnect', function(info) {
-        console.log(info.error);    // The error causing reconnection
-        console.log(info.attempts); // Number of reconnects attempted
+        stream.start();
     });
     stream.on('end', function(response) {
         console.log('stream end: ' + response);
-    // setTimeout(getStream, 5000);
-    });
-    stream.on('destroy', function(response) {
-        console.log('stream destroy: ' + response);
+        stream.start();
     });
 }
 
