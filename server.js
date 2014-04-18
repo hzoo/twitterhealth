@@ -33,7 +33,21 @@ app.use('/', express.static(__dirname + '/app'));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(express.compress());
 
+app.configure('development', function() {
+    var twit = new Twat({
+        consumer_key:         process.env.DEV_CONSUMER_KEY,
+        consumer_secret:      process.env.DEV_CONSUMER_SECRET,
+        access_token:     process.env.DEV_ACCESS_TOKEN,
+        access_token_secret:  process.env.DEV_ACCESS_TOKEN_SECRET
+    });
+});
 app.configure('production', function(){
+    var twit = new Twat({
+        consumer_key:         process.env.CONSUMER_KEY,
+        consumer_secret:      process.env.CONSUMER_SECRET,
+        access_token:     process.env.ACCESS_TOKEN,
+        access_token_secret:  process.env.ACCESS_TOKEN_SECRET
+    });
     //reduce console logs
     io.set('log level', 0);
     io.enable('browser client minification');  // send minified client
@@ -45,14 +59,6 @@ app.configure('production', function(){
         'xhr-polling',
         'jsonp-polling'
     ]);
-});
-
-//twitter
-var twit = new Twat({
-    consumer_key:         process.env.CONSUMER_KEY,
-    consumer_secret:      process.env.CONSUMER_SECRET,
-    access_token:     process.env.ACCESS_TOKEN,
-    access_token_secret:  process.env.ACCESS_TOKEN_SECRET
 });
 
 //variables
@@ -72,6 +78,10 @@ var lastNTweets = [];
 
 var tweetsRoot = new Firebase('https://twitterhealth.firebaseio.com/');
 var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
+
+var FirebaseTokenGenerator = require('./firebase-token-generator-node.js');
+var tokenGenerator = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET);
+var token = tokenGenerator.createToken({'username': 'admin'});
 
 function getTweetInfo(tweet, state) {
     'use strict';
