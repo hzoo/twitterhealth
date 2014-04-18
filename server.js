@@ -33,8 +33,10 @@ app.use('/', express.static(__dirname + '/app'));
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.use(express.compress());
 
+var twit;
 app.configure('development', function() {
-    var twit = new Twat({
+    console.log('dev');
+    twit = new Twat({
         consumer_key:         process.env.DEV_CONSUMER_KEY,
         consumer_secret:      process.env.DEV_CONSUMER_SECRET,
         access_token:     process.env.DEV_ACCESS_TOKEN,
@@ -42,7 +44,8 @@ app.configure('development', function() {
     });
 });
 app.configure('production', function(){
-    var twit = new Twat({
+    console.log('prod');
+    twit = new Twat({
         consumer_key:         process.env.CONSUMER_KEY,
         consumer_secret:      process.env.CONSUMER_SECRET,
         access_token:     process.env.ACCESS_TOKEN,
