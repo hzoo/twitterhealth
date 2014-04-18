@@ -6,8 +6,8 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <title>TwitterHealth</title>
-        <link rel="stylesheet" href="//cdn.jsdelivr.net/g/bootstrap(css/bootstrap.min.css)">
         <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="graph.css">
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
@@ -18,24 +18,27 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <div id="chart"></div>
                 </div>
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <div id="tweet"></div>
-                    <div width="500" height="163" class="tweet-box center-block">
+                    <div class="tweet-box center-block">
                         <h2>Fetching a tweet...</h2>
                     </div>
                     <div class="buttons hidden center-block">
                         <div class="btn btn-primary btn-lg">Sick [z]</div>
                         <div class="btn btn-danger btn-lg">Not [x]</div>
                         <div class="btn btn-warning btn-lg">Skip [c]</div>
-                        <!-- <div class="btn btn-info" id="getTweets">Get Tweets</div> -->
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div id="demo1"></div>
+            </div>
         </div>
         <script src="//cdn.jsdelivr.net/g/jquery,d3js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.2.2/cubism.v1.min.js"></script>
         <script src="//d3js.org/topojson.v1.min.js"></script>
         <script src="main.js"></script>
         <script src="twitter.js" charset="utf-8"></script>

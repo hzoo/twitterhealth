@@ -35,6 +35,7 @@ body {
 }
 
 .tweet-box {
+    width: 500px;
     display: block;
     max-width: 99%;
     min-width: 220px;
@@ -43,7 +44,7 @@ body {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
-    margin: 10px 0px;
+    margin: 10px auto;
     border-color: rgb(238, 238, 238) rgb(221, 221, 221) rgb(187, 187, 187);
     border-width: 1px;
     border-style: solid;
@@ -52,4 +53,44 @@ body {
     visibility: visible;
     text-align: center;
     background: #fff;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+.btn-warning {
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+.btn-danger {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.hidden {
+    display: none;
 }

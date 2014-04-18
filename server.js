@@ -1,7 +1,8 @@
 //packages
 var fs = require('fs');
 var dotenv = require('dotenv');
-var Twat = require('twat');
+// var Twat = require('twat');
+var Twat = require('twit');
 var async = require('async');
 var Firebase = require('firebase');
 dotenv.load();
@@ -152,8 +153,9 @@ io.sockets.on('connection', function (socket) {
             // console.log(granularityLabel,granularityDuration);
             async.parallel(states.map(
                 function(cmd) {
-                    // return createHandler(cmd, 1344, granularityLabel);
-                    return createHandler(cmd, 6, granularityLabel);
+                    // return createHandler(cmd, 672, granularityLabel);
+                    return createHandler(cmd, 10, granularityLabel);
+                    // return createHandler(cmd, 6, granularityLabel);
                 }), function(err, data) {
                         socket.emit('history', data);
                     });
@@ -183,70 +185,67 @@ io.sockets.on('connection', function (socket) {
 
 function getStream() {
     'use strict';
-    twit.stream(
+    var stream = twit.stream(
         'statuses/filter',
-        { track: trackWords },
-        // {'locations': ['-180','15','19','72']}, //usa
-        function(stream) {
-            stream.on('tweet', function(tweet) {
-                //filter out urls and tweets geocoded in usa
-                if ((!tweet.entities || tweet.entities.urls.length === 0) && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
-                    var state = tweet.place.full_name.split(',')[1];
-                    if (state) {
-                        state = state.trim();
-                    }
-                    //assert length
-                    if (state !== undefined && state !== 'US' && state.length === 2) {
-                        var tweetData = getTweetInfo(tweet,state);
-                        var type = classifier.classify(tweetData.text);
-                        if (type === 'sick') {
-                            console.log(type + ' ' + tweetData.text);
-                            async.parallel(states.map(
-                                function(cmd) {
-                                    return function(callback) {
-                                        ts.getHits(cmd, '1second', 900, function(err, data) {
-                                            if (err) {
-                                                console.log('err: ' + err);
-                                            } else {
-                                                var temp = data.map(function(data) {
-                                                    return data[1];
-                                                }).reduce(function(a, b) {
-                                                    return a + b;
-                                                });
-                                                callback(null, temp);
-                                            }
-                                        });
-                                    }
-                                }), function(err, data) {
-                                        io.sockets.volatile.emit('getTweet', tweetData, data);
-                                    });
-                            // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
-                            if (app.settings.env === 'production') {
-                                ts.recordHit(state).exec();
-                            }
-                        } else {
-                            io.sockets.volatile.emit('getTweet', tweetData);
-                        }
-                    }
-                }
-            });
+        { track: trackWords });
 
-            stream.on('error', function(error, data) {
-                console.log('stream err: ', error, data);
-            });
-            stream.on('reconnect', function(info) {
-                console.log(info.error);    // The error causing reconnection
-                console.log(info.attempts); // Number of reconnects attempted
-            });
-            stream.on('end', function(response) {
-                console.log('stream end: ' + response);
-                // setTimeout(getStream, 5000);
-            });
-            stream.on('destroy', function(response) {
-                console.log('stream destroy: ' + response);
-            });
+    stream.on('tweet', function(tweet) {
+        //filter out urls and tweets geocoded in usa
+        if ((!tweet.entities || tweet.entities.urls.length === 0) && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
+            var state = tweet.place.full_name.split(',')[1];
+            if (state) {
+                state = state.trim();
+            }
+            //assert length
+            if (state !== undefined && state !== 'US' && state.length === 2) {
+                var tweetData = getTweetInfo(tweet,state);
+                var type = classifier.classify(tweetData.text);
+                if (type === 'sick') {
+                    console.log(type + ' ' + tweetData.text);
+                    async.parallel(states.map(
+                        function(cmd) {
+                            return function(callback) {
+                                ts.getHits(cmd, '1second', 900, function(err, data) {
+                                    if (err) {
+                                        console.log('err: ' + err);
+                                    } else {
+                                        var temp = data.map(function(data) {
+                                            return data[1];
+                                        }).reduce(function(a, b) {
+                                            return a + b;
+                                        });
+                                        callback(null, temp);
+                                    }
+                                });
+                            }
+                        }), function(err, data) {
+                                io.sockets.volatile.emit('getTweet', tweetData, data);
+                            });
+                    // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
+                    if (app.settings.env === 'production') {
+                        ts.recordHit(state).exec();
+                    }
+                } else {
+                    io.sockets.volatile.emit('getTweet', tweetData);
+                }
+            }
         }
-    );
+    });
+
+    stream.on('error', function(error, data) {
+        console.log('stream err: ', error, data);
+    });
+    stream.on('reconnect', function(info) {
+        console.log(info.error);    // The error causing reconnection
+        console.log(info.attempts); // Number of reconnects attempted
+    });
+    stream.on('end', function(response) {
+        console.log('stream end: ' + response);
+    // setTimeout(getStream, 5000);
+    });
+    stream.on('destroy', function(response) {
+        console.log('stream destroy: ' + response);
+    });
 }
 
 // classifier = natural.BayesClassifier.restore(

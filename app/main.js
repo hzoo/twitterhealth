@@ -36,7 +36,8 @@ var color = d3.scale.linear()
 var isTweetDisplayed = false;
 var tweet;
 var tweetQueue = [];
-var colorRange = [-3,0,3];
+var colorMax = 3;
+var colorRange = [-1 * colorMax, 0, colorMax];
 
 function getResetStates() {
     return {'AL' : [],'AK' : [],'AZ' : [],'AR' : [],'CA' : [],'CO' : [],'CT' : [],'DE' : [],'DC' : [],'FL' : [],'GA' : [],'HI' : [],'ID' : [],'IL' : [],'IN' : [],'IA' : [],'KS' : [],'KY' : [],'LA' : [],'ME' : [],'MD' : [],'MA' : [],'MI' : [],'MN' : [],'MS' : [],'MO' : [],'MT' : [],'NE' : [],'NV' : [],'NH' : [],'NJ' : [],'NM' : [],'NY' : [],'NC' : [],'ND' : [],'OH' : [],'OK' : [],'OR' : [],'PA' : [],'RI' : [],'SC' : [],'SD' : [],'TN' : [],'TX' : [],'UT' : [],'VI': [],'VT' : [],'VA' : [],'WA' : [],'WV' : [],'WI' : [],'WY' : [],'PR' : []};
@@ -176,6 +177,11 @@ socket.on('getTweet', function (sentData, tweets15min) {
                 var state = d.properties.code;
                 if (tweetAverages[state] !== 0) {
                     var percentDiff = (tweets15min[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
+                    if (percentDiff > colorMax) {
+                        percentDiff = colorMax;
+                    } else if (percentDiff < -1 * colorMax) {
+                        percentDiff = -1 * colorMax;
+                    }
                     // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
                 } else {
                     var percentDiff = 0;
@@ -220,6 +226,93 @@ var tweets15min = {};
 var mainTimeline;
 var total = [];
 
+//tweet timeline
+
+//create metric
+var step = 9e5;
+var graphSize = 672;
+var context = cubism.context()
+    .serverDelay(100)
+    .clientDelay(0)
+    .step(step)
+    .size(graphSize);
+
+context.on('focus', function(i) {
+    d3.selectAll('.value').style('right',                  // Make the rule coincide
+        i === null ? null : 30 + context.size() - i + 'px'); // with the mouse
+});
+
+function makeWithConcat(len) {
+    var a, rem, currlen;
+    if (len === 0) {
+        return [];
+    }
+    a = [0];
+    currlen = 1;
+    while (currlen < len) {
+        rem = len - currlen;
+        if (rem < currlen) {
+            a = a.concat(a.slice(0, rem));
+        }
+        else {
+            a = a.concat(a);
+        }
+        currlen = a.length;
+    }
+    return a;
+}
+
+function command(state) {
+    var firstTime = true,
+    values = [];
+    // last;
+    return context.metric(function(start, stop, step, callback) {
+        if (firstTime) {
+            var data = tweetDensity[state];
+            firstTime = false;
+            // start = +start;
+            // stop = +stop;
+            // if (isNaN(last)) { last = start; }
+            // while (last < stop) {
+            //     last += step;
+            //     values.push(1);
+            // }
+            values = makeWithConcat(graphSize - data.length);
+            values = values.concat(data);
+            callback(null, values = values.slice((start - stop) / step));
+        } else {
+            // console.log(tweetDensity[state]);
+            values = tweetDensity[state];
+            callback(null, values = values.slice((start - stop) / step));
+        }
+    }, name);
+}
+
+function startGraph() {
+    var states = command('CA');
+
+    d3.select('#demo1').call(function (div) {
+        //axis
+        div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
+
+        //horizon chart
+        div.selectAll('.horizon')
+                .data([states])
+            .enter().append('div')
+                .attr('class', 'horizon')
+                .call(context.horizon()
+                    .height(60)
+                    // .colors([0].concat(colorbrewer.Purples[3]))
+                    .colors([0].concat(["#fee6ce","#fdae6b","#e6550d"]))
+                );
+
+        //line
+        div.append('div')
+             .attr('class', 'rule')
+             .call(context.rule());
+    });
+}
+
 socket.on('history', function(data){
     console.log('history:',data);
     for (var i = 0; i < data.length; i++) {
@@ -234,7 +327,7 @@ socket.on('history', function(data){
     //     }
     //     total.push([tempTotal]);
     // }
-
+    startGraph();
 });
 socket.on('history2', function(data){
     for (state in tweetDensity) {
@@ -256,6 +349,11 @@ socket.on('history2', function(data){
                 if (tweetAverages[state] !== 0) {
                     var percentDiff = (data[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
                     // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
+                    if (percentDiff > colorMax) {
+                        percentDiff = colorMax;
+                    } else if (percentDiff < -1 * colorMax) {
+                        percentDiff = -1 * colorMax;
+                    }
                 } else {
                     var percentDiff = 0;
                 }
