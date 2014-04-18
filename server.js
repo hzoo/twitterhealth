@@ -76,8 +76,6 @@ var trackWords = [
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
-var nTweets = 2;
-var lastNTweets = [];
 
 var tweetsRoot = new Firebase('https://twitterhealth.firebaseio.com/');
 var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
@@ -137,8 +135,6 @@ function createHandler(command, count, granularityLabel) {
 }
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('lastNTweets', lastNTweets);
-
     socket.on('classfyTweet', function(type, tweet) {
         addTweet(tweet, type);
     });
@@ -208,10 +204,6 @@ function getStream() {
                                         return a + b;
                                     });
                                     io.sockets.volatile.emit('getTweet', tweetData, temp);
-                                    lastNTweets.push(tweetData);
-                                    if (lastNTweets.length >= nTweets) {
-                                        lastNTweets.shift();
-                                    }
                                 }
                             });
                             // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
