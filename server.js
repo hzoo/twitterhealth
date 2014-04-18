@@ -67,7 +67,7 @@ var trackWords = [
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
-var nTweets = 2+1;
+var nTweets = 2;
 var lastNTweets = [];
 
 var tweetsRoot = new Firebase('https://twitterhealth.firebaseio.com/');
