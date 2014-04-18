@@ -454,7 +454,7 @@ introSteps = [
         position: 'top'
     }
     ];
-if (window.innerWidth > 768) {
+if (window.innerWidth >= 768) {
     introSteps.push(
     {
         element: '#mainTimeline',
