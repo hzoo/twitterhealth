@@ -218,7 +218,7 @@ function getStream() {
             });
             stream.on('end', function(response) {
                 console.log('stream end: ' + response);
-                setTimeout(getStream, 5000);
+                // setTimeout(getStream, 5000);
             });
             stream.on('destroy', function(response) {
                 console.log('stream destroy: ' + response);
@@ -233,7 +233,7 @@ function getStream() {
 classifierRoot.on('value', function(snapshot) {
     var val = JSON.parse(snapshot.val());
     classifier = natural.BayesClassifier.restore(val);
-    // classifier.addDocument('i hate being sick', 'sick');
+    // classifier.addDocument('i hate being sick', 'sick');sj
     // classifier.addDocument('sick of', 'not');
     // classifier.train();
     // classifierRoot.set(JSON.stringify(classifier));
