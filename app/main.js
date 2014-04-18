@@ -172,10 +172,13 @@ socket.on('getTweet', function (sentData, tweets15min) {
         id: sentData.id,
         text: sentData.text
     });
-    tweetQueue.push({
-        id: sentData.id,
-        text: sentData.text
-    });
+
+    if (tweetQueue.length === 0 || tweetQueue[tweetQueue.length-1].id !== sentData.id) {
+        tweetQueue.push({
+            id: sentData.id,
+            text: sentData.text
+        });
+    }
 
     // color.domain([0, d3.max(d3.values(tweetDensity).map(function(v){
     //     return v.length;
