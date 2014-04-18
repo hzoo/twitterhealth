@@ -79,7 +79,7 @@ var lastNTweets = [];
 var tweetsRoot = new Firebase('https://twitterhealth.firebaseio.com/');
 var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
 
-var FirebaseTokenGenerator = require('./firebase-token-generator-node.js');
+var FirebaseTokenGenerator = require('firebase-token-generator');
 var tokenGenerator = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET);
 var token = tokenGenerator.createToken({'username': 'admin'});
 
