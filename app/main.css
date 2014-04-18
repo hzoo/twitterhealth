@@ -2,7 +2,13 @@
     display: none;
 }
 
+html {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
 body {
+    margin: 0 10px;
     font-family: "Helvetica Neue",Arial,sans-serif;
     background: radial-gradient(circle,#94d2f8,#3a92c8);
 }
@@ -98,4 +104,21 @@ body {
 #mainTimeline, #stateTimeline {
     width: 672px;
     margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .col-sm-6 {
+        width: 50%;
+        float: left;
+    }
+}
+@media (max-width: 768px) {
+    .col-sm-6 {
+        width: 100%;
+    }
+}
+
+.row {
+    clear: both;
+    width: 100%;
 }
