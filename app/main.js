@@ -439,8 +439,7 @@ $('#getTweets').click(function() {
 });
 
 var intro = introJs();
-intro.setOptions({
-    steps: [
+introSteps = [
     {
         element: 'h1',
         intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.\nIt uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data."
@@ -453,13 +452,18 @@ intro.setOptions({
         element: '#tweetClassifer',
         intro: "Please help train our machine learning algorithm/contribute to open source classified tweet data!\nClick the buttons 'sick', 'not' or 'skip' depending on if the tweet is actually talking about feeling ill/sick, not talking about feeling ill/sick or you can't tell. Keyboard shortcuts to click 'sick', 'not', and 'skip' are 'z', 'x', and 'c' respectively.",
         position: 'top'
-    },
+    }
+    ];
+if (window.innerWidth > 768) {
+    introSteps.push(
     {
         element: '#mainTimeline',
         intro: "This chart shows the number of tweets per 15 minute interval in the entire united states over the last week.",
         position: 'top'
-    }
-    ]
+    });
+}
+intro.setOptions({
+    steps: introSteps
 });
 $('#instructions').click(function() {
     intro.start();
