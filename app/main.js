@@ -67,6 +67,7 @@ function clicked(d) {
     if (active.node() === this) {
         return reset();
     }
+    startGraph(d.properties.code, '#stateTimeline');
     active.classed('active', false);
     active = d3.select(this).classed('active', true);
 
@@ -308,13 +309,21 @@ function command(state) {
     }, name);
 }
 
-function startGraph() {
-    var states = command('all');
+function startGraph(state, timeline) {
+    var states = command(state);
 
-    d3.select('#mainTimeline').call(function (div) {
-        //axis
-        div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
-
+    d3.select(timeline).call(function (div) {
+        if (state === 'all') {
+            //axis
+            div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
+            //line
+            // div.append('div')
+            //     .attr('class', 'rule')
+            //     .call(context.rule());
+        }
+        if ($('#stateTimeline').children.length !== 0) {
+            $('#stateTimeline').html('');
+        }
         //horizon chart
         div.selectAll('.horizon')
                 .data([states])
@@ -322,18 +331,21 @@ function startGraph() {
                 .attr('class', 'horizon')
                 .call(context.horizon()
                     .height(60)
+                    .extent(function() {
+                        return [0,60].map(function(d) {return d*step/1000/60/5;});
+                    })
                     // .colors([0].concat(colorbrewer.Purples[3]))
                     // .colors([0].concat(["#fee6ce","#fdae6b","#e6550d"]))
                     .colors(["#e66101","#fdb863","#b2abd2","#5e3c99"])
+                    .title(function() {
+                        if (state === 'all'){
+                            return 'USA';
+                        } else{
+                            return state;
+                        }
+                    })
                 );
-
-        //line
-        div.append('div')
-             .attr('class', 'rule')
-             .call(context.rule());
     });
-
-    $('#instructions').removeClass('hidden');
 }
 
 socket.on('history', function(data){
@@ -342,9 +354,12 @@ socket.on('history', function(data){
         tweetDensity[stateArray[i]] = data[i];
     }
 
-    startGraph();
+    $('#instructions').removeClass('hidden');
+    startGraph('all', '#mainTimeline');
 });
+
 socket.on('history2', function(data){
+    console.log(data);
     for (state in tweetDensity) {
         //use last four numbers for the average
         tweetAverages[state] = tweetDensity[state].slice(-4).reduce(function(a,b){

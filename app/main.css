@@ -95,7 +95,7 @@ body {
     display: none;
 }
 
-#mainTimeline {
+#mainTimeline, #stateTimeline {
     width: 672px;
     margin: 0 auto;
 }
