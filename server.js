@@ -85,6 +85,7 @@ var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
 var FirebaseTokenGenerator = require('firebase-token-generator');
 var tokenGenerator = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET);
 var token = tokenGenerator.createToken({'username': 'admin'});
+console.log(token);
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -243,12 +244,19 @@ function getStream() {
 // classifier = natural.BayesClassifier.restore(
 //     JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
 
-classifierRoot.on('value', function(snapshot) {
-    var val = JSON.parse(snapshot.val());
-    classifier = natural.BayesClassifier.restore(val);
-    // classifier.addDocument('i hate being sick', 'sick');sj
-    // classifier.addDocument('sick of', 'not');
-    // classifier.train();
-    // classifierRoot.set(JSON.stringify(classifier));
-    getStream();
+tweetsRoot.auth(token, function(error) {
+  if(error) {
+    console.log("Login Failed!", error);
+  } else {
+    console.log("Login Succeeded!");
+    classifierRoot.on('value', function(snapshot) {
+        var val = JSON.parse(snapshot.val());
+        classifier = natural.BayesClassifier.restore(val);
+        // classifier.addDocument('i hate being sick', 'sick');sj
+        // classifier.addDocument('sick of', 'not');
+        // classifier.train();
+        // classifierRoot.set(JSON.stringify(classifier));
+        getStream();
+    });
+  }
 });
