@@ -153,8 +153,7 @@ io.sockets.on('connection', function (socket) {
             // console.log(granularityLabel,granularityDuration);
             async.parallel(states.map(
                 function(cmd) {
-                    // return createHandler(cmd, 672, granularityLabel);
-                    return createHandler(cmd, 10, granularityLabel);
+                    return createHandler(cmd, 672, granularityLabel);
                     // return createHandler(cmd, 6, granularityLabel);
                 }), function(err, data) {
                         socket.emit('history', data);

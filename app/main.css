@@ -94,3 +94,8 @@ body {
 .hidden {
     display: none;
 }
+
+#mainTimeline {
+    width: 672px;
+    margin: 0 auto;
+}

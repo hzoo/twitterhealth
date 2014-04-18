@@ -95,6 +95,12 @@ d3.json('us-named.json', function(error, us) {
         .attr('id', function(d) { return d.properties.code;})
         .on('click', clicked);
 
+    color.domain(colorRange);
+    states.selectAll('path')
+        .transition()
+        .duration(500)
+        .style('fill', color(0));
+
     socket.emit('getPastTweets');
 });
 
@@ -239,7 +245,7 @@ var context = cubism.context()
 
 context.on('focus', function(i) {
     d3.selectAll('.value').style('right',                  // Make the rule coincide
-        i === null ? null : 30 + context.size() - i + 'px'); // with the mouse
+        i === null ? null : context.size() - i + 'px'); // with the mouse
 });
 
 function makeWithConcat(len) {
@@ -268,7 +274,21 @@ function command(state) {
     // last;
     return context.metric(function(start, stop, step, callback) {
         if (firstTime) {
-            var data = tweetDensity[state];
+            var data;
+            if (state === 'all') {
+                var total = [];
+                var numHistory = tweetDensity[stateArray[0]].length;
+                for (var i = 0; i < numHistory; i++) {
+                    var tempTotal = 0;
+                    for (state in tweetDensity) {
+                        tempTotal += tweetDensity[state][i];
+                    }
+                    total.push([tempTotal]);
+                }
+                data = total;
+            } else {
+                data = tweetDensity[state];
+            }
             firstTime = false;
             // start = +start;
             // stop = +stop;
@@ -289,9 +309,9 @@ function command(state) {
 }
 
 function startGraph() {
-    var states = command('CA');
+    var states = command('all');
 
-    d3.select('#demo1').call(function (div) {
+    d3.select('#mainTimeline').call(function (div) {
         //axis
         div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
 
@@ -303,7 +323,8 @@ function startGraph() {
                 .call(context.horizon()
                     .height(60)
                     // .colors([0].concat(colorbrewer.Purples[3]))
-                    .colors([0].concat(["#fee6ce","#fdae6b","#e6550d"]))
+                    // .colors([0].concat(["#fee6ce","#fdae6b","#e6550d"]))
+                    .colors(["#e66101","#fdb863","#b2abd2","#5e3c99"])
                 );
 
         //line
@@ -311,6 +332,8 @@ function startGraph() {
              .attr('class', 'rule')
              .call(context.rule());
     });
+
+    $('#instructions').removeClass('hidden');
 }
 
 socket.on('history', function(data){
@@ -319,19 +342,12 @@ socket.on('history', function(data){
         tweetDensity[stateArray[i]] = data[i];
     }
 
-    // var numHistory = tweetDensity[stateArray[0]].length;
-    // for (var i = 0; i < numHistory; i++) {
-    //     var tempTotal = 0;
-    //     for (state in tweetDensity) {
-    //         tempTotal += tweetDensity[state][i];
-    //     }
-    //     total.push([tempTotal]);
-    // }
     startGraph();
 });
 socket.on('history2', function(data){
     for (state in tweetDensity) {
-        tweetAverages[state] = tweetDensity[state].reduce(function(a,b){
+        //use last four numbers for the average
+        tweetAverages[state] = tweetDensity[state].slice(-4).reduce(function(a,b){
             return a + b;
         },0)/tweetDensity[state].length;
     }
@@ -381,19 +397,19 @@ function onButtonClick() {
     displayTweet(tweet);
 }
 
-$('.btn-primary').click(function() {
+$('#sick').click(function() {
     tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
     socket.emit('classifyTweet', 'sick', tweet);
     onButtonClick();
 });
 
-$('.btn-danger').click(function() {
+$('#notsick').click(function() {
     tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
     socket.emit('classifyTweet', 'not', tweet);
     onButtonClick();
 });
 
-$('.btn-warning').click(function() {
+$('#skip').click(function() {
     tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
     socket.emit('classifyTweet', 'dono', tweet);
     onButtonClick();
@@ -401,6 +417,33 @@ $('.btn-warning').click(function() {
 
 $('#getTweets').click(function() {
     socket.emit('getTweets');
+});
+
+var intro = introJs();
+intro.setOptions({
+    steps: [
+    {
+        element: 'h1',
+        intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.\nIt uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data."
+    },
+    {
+        element: '#chart',
+        intro: "The map displays the number of 'sick' tweets normalized by the average number of 'sick' tweets by state (yellow is below average and purple is above average). The last 100 'sick' tweets that have been received  are displayed as points on the map. Click on an individual state to get look at time series and related data.",
+    },
+    {
+        element: '#tweetClassifer',
+        intro: "Please help train our machine learning algorithm/contribute to open source classified tweet data!\nClick the buttons 'sick', 'not' or 'skip' depending on if the tweet is actually talking about feeling ill/sick, not talking about feeling ill/sick or you can't tell. Keyboard shortcuts to click 'sick', 'not', and 'skip' are 'z', 'x', and 'c' respectively.",
+        position: 'top'
+    },
+    {
+        element: '#mainTimeline',
+        intro: "This chart shows the number of tweets per 15 minute interval in the entire united states over the last week.",
+        position: 'top'
+    }
+    ]
+});
+$('#instructions').click(function() {
+    intro.start();
 });
 
 $(document).on('keydown', function(event) {

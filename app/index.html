@@ -8,6 +8,7 @@
         <title>TwitterHealth</title>
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="graph.css">
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/intro.js/0.6.0/introjs.min.css">
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
@@ -15,29 +16,31 @@
             <div class="row">
                 <div class="title">
                     <h1>TwitterHealth: Where Do People Need Help?</h1>
+                    <div id="instructions" class="btn btn-primary hidden">Instructions</div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-6">
                     <div id="chart"></div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6" id="tweetClassifer">
                     <div id="tweet"></div>
                     <div class="tweet-box center-block">
                         <h2>Fetching a tweet...</h2>
                     </div>
                     <div class="buttons hidden center-block">
-                        <div class="btn btn-primary btn-lg">Sick [z]</div>
-                        <div class="btn btn-danger btn-lg">Not [x]</div>
-                        <div class="btn btn-warning btn-lg">Skip [c]</div>
+                        <div id="sick" class="btn btn-primary btn-lg">Sick [z]</div>
+                        <div id="notsick" class="btn btn-danger btn-lg">Not [x]</div>
+                        <div id="skip" class="btn btn-warning btn-lg">Skip [c]</div>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div id="demo1"></div>
+                <div id="mainTimeline"></div>
             </div>
         </div>
-        <script src="//cdn.jsdelivr.net/g/jquery,d3js"></script>
+        <script src="//cdn.jsdelivr.net/g/jquery,intro.js"></script>
+        <script src="http://d3js.org/d3.v3.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.2.2/cubism.v1.min.js"></script>
         <script src="//d3js.org/topojson.v1.min.js"></script>
         <script src="main.js"></script>
