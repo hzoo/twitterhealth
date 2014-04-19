@@ -116,7 +116,7 @@ function addTweet(tweetData, type) {
         tweetsRoot.child('tweets').child('not').push(tweetData);
         classifyCount++;
     }
-    if (classifyCount >= 5) {
+    if (classifyCount >= 3) {
         classifier.train();
         classifyCount = 0;
         classifierRoot.set(JSON.stringify(classifier));
@@ -233,7 +233,7 @@ function getStream() {
 
     stream.on('error', function(error, data) {
         console.log('stream err: ', error, data);
-        stream.start();
+        // stream.start();
     });
     stream.on('end', function(response) {
         console.log('stream end: ' + response);
