@@ -190,7 +190,7 @@ function getStream() {
 
     stream.on('tweet', function(tweet) {
         //filter out urls and tweets geocoded in usa
-        if ((!tweet.entities || tweet.entities.urls.length === 0) && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
+        if (tweet.entities.urls.length === 0 && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
             var state = tweet.place.full_name.split(',')[1];
             if (state) {
                 state = state.trim();

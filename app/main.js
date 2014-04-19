@@ -441,7 +441,7 @@ $('#getTweets').click(function() {
 var intro = introJs();
 introSteps = [
     {
-        element: 'h1',
+        element: '.title',
         intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.\nIt uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data."
     },
     {
