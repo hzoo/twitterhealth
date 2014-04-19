@@ -68,17 +68,17 @@ app.configure('production', function(){
 //variables
 var trackWords = [
     'infective','contagious','catching','rampant','prevailing','pandemic',
-    'run down','infected','ailing','ill','feeble','in poor health',
-    'under the weather','unwell','weak','lousy','queasy','impaired',
-    'sweat','incurable','down','help','health','disease','temperature',
+    'run down','infected','ailing','feeble','in poor health',
+    'under the weather','unwell','feel weak','feel lousy','queasy','impaired',
+    'sweat','incurable','health','disease','temperature',
     'rotten','terrible','wreck','run-down','bummed','doctor',
-    'feeling','pain','cold','cry','hospital','ache','medicine','allergic',
+    'pain','cry','hospital','ache','medicine','allergic',
     'depression','hurt','blood','meds','flu','sneezing','cough','aches',
     'pressure','sore','treatment','surgery',
     'antibiotics','virus','sick','sinus','painful','runny nose','chills',
     'headache','allergy','inflammation','fever','infection','toothache',
-    'tumor','fractured','burn','vomiting','i feel','worthless',
-    'like crap','like shit','crappy','shitty','horrible','fml','tired'
+    'tumor','fractured','burn','vomiting','worthless',
+    'like crap','like shit','crappy','shitty','horrible','tired'
     //'hot','sucked'
 ];
 

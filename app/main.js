@@ -472,12 +472,12 @@ $('#instructions').click(function() {
 $(document).on('keydown', function(event) {
     if (event.which === 90) {
         event.preventDefault();
-        $('.btn-primary').click();
+        $('#sick').click();
     } else if (event.which === 88) {
         event.preventDefault();
-        $('.btn-danger').click();
+        $('#notsick').click();
     } else if (event.which === 67) {
         event.preventDefault();
-        $('.btn-warning').click();
+        $('#skip').click();
     }
 });
