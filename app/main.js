@@ -65,6 +65,7 @@ svg.selectAll('rect')
 
 function clicked(d) {
     if (active.node() === this) {
+        $('#stateTimeline').html('');
         return reset();
     }
     if (window.innerWidth > 768) {
