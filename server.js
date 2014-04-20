@@ -237,6 +237,7 @@ function getStream() {
     });
     stream.on('end', function(response) {
         console.log('stream end: ' + response);
+        stream.stop();
         stream.start();
     });
 }
