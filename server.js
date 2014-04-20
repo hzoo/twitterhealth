@@ -67,19 +67,20 @@ app.configure('production', function(){
 
 //variables
 var trackWords = [
-    'infective','contagious','catching','rampant','prevailing','pandemic',
-    'run down','infected','ailing','feeble','in poor health',
-    'under the weather','unwell','feel weak','feel lousy','queasy','impaired',
-    'sweat','incurable','health','disease','temperature',
-    'rotten','terrible','wreck','run-down','bummed','doctor',
-    'pain','cry','hospital','ache','medicine','allergic',
-    'depression','hurt','blood','meds','flu','sneezing','cough','aches',
-    'pressure','sore','treatment','surgery',
-    'antibiotics','virus','sick','sinus','painful','runny nose','chills',
-    'headache','allergy','inflammation','fever','infection','toothache',
-    'tumor','fractured','burn','vomiting','worthless',
-    'like crap','like shit','crappy','shitty','horrible','tired'
-    //'hot','sucked'
+   'contagious','catching','prevailing','pandemic', 'caught a bug',
+   'run down','infected','ailing', 'in poor health', 'stomach bug', 'stomach hurt',
+   'under the weather','unwell','feel weak','feel lousy','feel queasy', 'tummy hurts',
+   'sweats','incurable','health','disease','running a temperature', 'watery eyes',
+   'doctor', 'nausea', 'nauseous', 'throw up', 'mucus', 'diarrhea', 'can\'t breathe',
+   'hospital','ache', 'achy', 'medicine','allergic', 'sneeze', 'sneezing',
+   'meds','flu','sneezing','cough','aches', 'feel miserable', 'congested',
+   'pressure','sore throat','treatment','surgery', 'illness', 'not feeling well',
+   'antibiotics','virus','sick','sinus','painful','runny nose','chills',
+   'allergy','inflammation','fever','infection', 'stuffed up','itchy eyes',
+   'vomiting', 'vomit', 'feel terrible', 'feeling terrible', 'stuffy', 'scratchy throat',
+   'feel like crap','feel crappy','feel horrible', 'feeling horrible', 'feeling crappy'
+   //'hot','sucked','feeble','tumor','impaired','cry','depression','hurt','blood',
+   //'toothache','fractured','worthless','tired'
 ];
 
 var states = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
@@ -258,7 +259,9 @@ tweetsRoot.auth(token, function(error) {
         // classifier.addDocument('sick of', 'not');
         // classifier.train();
         // classifierRoot.set(JSON.stringify(classifier));
-        getStream();
+        if (app.settings.env === 'production') {
+            getStream();
+        }
     });
   }
 });
