@@ -7,9 +7,6 @@
         <meta name="viewport" content="width=device-width">
         <title>TwitterHealth</title>
         <link rel="stylesheet" href="main.css">
-        <link rel="stylesheet" href="graph.css">
-        <link rel="stylesheet" href="//cdn.jsdelivr.net/intro.js/0.6.0/introjs.min.css">
-        <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
         <div class="container">
@@ -40,10 +37,13 @@
                 <div id="stateTimeline"></div>
             </div>
         </div>
-        <script src="//cdn.jsdelivr.net/g/jquery,intro.js,d3js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.2.2/cubism.v1.min.js"></script>
+        <script src="//cdn.jsdelivr.net/g/jquery,d3js,intro.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
         <script src="main.js"></script>
         <script src="twitter.js" charset="utf-8"></script>
+        <link rel="stylesheet" href="graph.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.2.2/cubism.v1.min.js"></script>
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/intro.js/0.6.0/introjs.min.css">
     </body>
 </html>

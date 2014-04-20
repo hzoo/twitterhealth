@@ -236,20 +236,10 @@ var mainTimeline;
 var total = [];
 
 //tweet timeline
-
 //create metric
-var step = 9e5;
-var graphSize = 672;
-var context = cubism.context()
-    .serverDelay(100)
-    .clientDelay(0)
-    .step(step)
-    .size(graphSize);
-
-context.on('focus', function(i) {
-    d3.selectAll('.value').style('right',                  // Make the rule coincide
-        i === null ? null : context.size() - i + 'px'); // with the mouse
-});
+var step;
+var graphSize;
+var context;
 
 function makeWithConcat(len) {
     var a, rem, currlen;
@@ -276,22 +266,22 @@ function command(state) {
     values = [];
     // last;
     return context.metric(function(start, stop, step, callback) {
-        if (firstTime) {
-            var data;
-            if (state === 'all') {
-                var total = [];
-                var numHistory = tweetDensity[stateArray[0]].length;
-                for (var i = 0; i < numHistory; i++) {
-                    var tempTotal = 0;
-                    for (state in tweetDensity) {
-                        tempTotal += tweetDensity[state][i];
-                    }
-                    total.push([tempTotal]);
+        var data;
+        if (state === 'all') {
+            var total = [];
+            var numHistory = tweetDensity[stateArray[0]].length;
+            for (var i = 0; i < numHistory; i++) {
+                var tempTotal = 0;
+                for (state in tweetDensity) {
+                    tempTotal += tweetDensity[state][i];
                 }
-                data = total;
-            } else {
-                data = tweetDensity[state];
+                total.push([tempTotal]);
             }
+            data = total;
+        } else {
+            data = tweetDensity[state];
+        }
+        if (firstTime) {
             firstTime = false;
             // start = +start;
             // stop = +stop;
@@ -308,10 +298,23 @@ function command(state) {
             values = tweetDensity[state];
             callback(null, values = values.slice((start - stop) / step));
         }
-    }, name);
+    }, state);
 }
 
 function startGraph(state, timeline) {
+    step = 9e5;
+    graphSize = 672;
+    context = cubism.context()
+        .serverDelay(100)
+        .clientDelay(0)
+        .step(step)
+        .size(graphSize);
+
+    context.on('focus', function(i) {
+        d3.selectAll('.value').style('right',                  // Make the rule coincide
+            i === null ? null : context.size() - i + 'px'); // with the mouse
+    });
+
     var states = command(state);
 
     d3.select(timeline).call(function (div) {
@@ -366,9 +369,10 @@ socket.on('history2', function(data){
     console.log(data);
     for (state in tweetDensity) {
         //use last four numbers for the average
-        tweetAverages[state] = tweetDensity[state].slice(-4).reduce(function(a,b){
+        numTimeToAverage = 4;
+        tweetAverages[state] = tweetDensity[state].slice(-1 * numTimeToAverage).reduce(function(a,b){
             return a + b;
-        },0)/tweetDensity[state].length;
+        },0)/numTimeToAverage; //tweetDensity[state].length;
     }
     console.log('history2: ',data);
     console.log('history2: ',tweetAverages);

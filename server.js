@@ -13,8 +13,6 @@ var express = require('express');
 var app     = express();
 var server  = require('http').createServer(app);
 var io          = require('socket.io').listen(server);
-io.set('log level', 1);
-io.set('transports', ['websocket']);
 
 var natural = require('natural');
 var classifyCount = 0;
@@ -43,6 +41,8 @@ app.configure('development', function() {
         access_token:     process.env.DEV_ACCESS_TOKEN,
         access_token_secret:  process.env.DEV_ACCESS_TOKEN_SECRET
     });
+    io.set('log level', 1);
+    io.set('transports', ['websocket']);
 });
 app.configure('production', function(){
     console.log('prod');
@@ -147,6 +147,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('getPastTweets', function(data){
+        console.log('sending history');
         var granularityLabel = '15minutes';//data.step;
         if (ts.granularities.hasOwnProperty(granularityLabel)) {
             var granularityDuration = ts.granularities[granularityLabel].duration;
