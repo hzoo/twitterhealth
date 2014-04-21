@@ -1,6 +1,6 @@
 //require
 var gulp = require('gulp');
-// var gutil = require('gulp-util');
+var gutil = require('gulp-util');
     // Load plugins
 var $ = require('gulp-load-plugins')({
         camelize: true
@@ -130,15 +130,13 @@ gulp.task('html',function() {
 var createServers = function (port, lrport) {
     var lr = tinylr();
     lr.listen(lrport, function () {
-        // gutil.log('LR Listening on', lrport);
-        console.log('LR Listening on', lrport);
+        gutil.log('LR Listening on', lrport);
     });
 
     var app = express();
     app.use(express.static(path.resolve('./')));
     app.listen(port, function () {
-        // gutil.log('Listening on', port);
-        console.log('Listening on', port);
+        gutil.log('Listening on', port);
     });
 
     return {
@@ -160,8 +158,7 @@ gulp.task('watch', ['server'], function () {
     gulp.watch(path.join(config.appDir,'*.html'), ['html']);
 
     gulp.watch(['./**/*', '!./node_modules/**/*'], function (evt) {
-        // gutil.log(gutil.colors.cyan(evt.path), 'changed');
-        console.log(evt.path, 'changed');
+        gutil.log(gutil.colors.cyan(evt.path), 'changed');
         servers.lr.changed({
             body: {
                 files: [evt.path]
