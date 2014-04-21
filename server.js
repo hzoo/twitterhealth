@@ -222,7 +222,7 @@ function getStream() {
                             });
                     // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
                     if (app.settings.env === 'production') {
-                        ts.recordHit(state).exec();
+                        ts.recordHit(state).recordHit('all').exec();
                     } else {
                         console.log('sick: ', tweetData.text);
                     }
