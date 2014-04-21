@@ -282,23 +282,7 @@ function command(state) {
         } else {
             data = tweetDensity[state];
         }
-        if (firstTime) {
-            firstTime = false;
-            // start = +start;
-            // stop = +stop;
-            // if (isNaN(last)) { last = start; }
-            // while (last < stop) {
-            //     last += step;
-            //     values.push(1);
-            // }
-            values = makeWithConcat(graphSize - data.length);
-            values = values.concat(data);
-            callback(null, values = values.slice((start - stop) / step));
-        } else {
-            // console.log(tweetDensity[state]);
-            values = tweetDensity[state];
-            callback(null, values = values.slice((start - stop) / step));
-        }
+        callback(null, data);
     }, state);
 }
 
@@ -309,7 +293,8 @@ function startGraph(state, timeline) {
         .serverDelay(100)
         .clientDelay(0)
         .step(step)
-        .size(graphSize);
+        .size(graphSize)
+        .stop();
 
     context.on('focus', function(i) {
         d3.selectAll('.value').style('right',                  // Make the rule coincide
