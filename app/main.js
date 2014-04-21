@@ -88,7 +88,7 @@ function clicked(d) {
         .attr('transform', 'translate(' + translate + ')scale(' + scale + ')');
 }
 
-d3.json('us-named.json', function(error, us) {
+d3.json('us-named-states.json', function(error, us) {
     states.selectAll('path')
     .data(topojson.feature(us, us.objects.states).features.filter(function(state){
             return state.properties.code !== 'AK';
