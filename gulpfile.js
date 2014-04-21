@@ -1,13 +1,13 @@
 //require
-var gulp = require('gulp'),
-    gutil = require('gulp-util'),
+var gulp = require('gulp');
+var gutil = require('gulp-util');
     // Load plugins
-    $ = require('gulp-load-plugins')({
+var $ = require('gulp-load-plugins')({
         camelize: true
-    }),
-    tinylr = require('tiny-lr'),
-    express = require('express'),
-    path = require('path');
+    });
+var tinylr = require('tiny-lr');
+var express = require('express');
+var path = require('path');
 
 //folders
 var config = {

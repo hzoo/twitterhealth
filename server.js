@@ -59,12 +59,12 @@ app.configure('production', function(){
     ]);
     appFolder = 'dist';
 });
+app.use(express.compress());
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/' + appFolder +'/index.html');
 });
 app.use('/', express.static(__dirname + '/' + appFolder));
-app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-app.use(express.compress());
 
 //variables
 var trackWords = [
