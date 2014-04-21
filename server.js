@@ -34,7 +34,7 @@ app.use(express.compress());
 
 var twit;
 app.configure('development', function() {
-    console.log('dev');
+    console.log('running on dev');
     twit = new Twat({
         consumer_key:         process.env.DEV_CONSUMER_KEY,
         consumer_secret:      process.env.DEV_CONSUMER_SECRET,
@@ -45,7 +45,7 @@ app.configure('development', function() {
     io.set('transports', ['websocket']);
 });
 app.configure('production', function(){
-    console.log('prod');
+    console.log('running on prod');
     twit = new Twat({
         consumer_key:         process.env.CONSUMER_KEY,
         consumer_secret:      process.env.CONSUMER_SECRET,
@@ -91,7 +91,6 @@ var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
 var FirebaseTokenGenerator = require('firebase-token-generator');
 var tokenGenerator = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET);
 var token = tokenGenerator.createToken({'username': 'admin'});
-console.log(token);
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -131,7 +130,7 @@ function createHandler(command, count, granularityLabel) {
     return function(callback) {
         ts.getHits(command, granularityLabel, count, function(err, data) {
             if (err) {
-                console.log('err: ' + err);
+                console.log('ts err: ' + err);
             } else {
                 var temp = data.map(function(data) {
                         return data[1];
@@ -165,7 +164,7 @@ io.sockets.on('connection', function (socket) {
                     return function(callback) {
                         ts.getHits(cmd, '1second', 900, function(err, data) {
                             if (err) {
-                                console.log('err: ' + err);
+                                console.log('ts history2 err: ' + err);
                             } else {
                                 var temp = data.map(function(data) {
                                     return data[1];
@@ -202,13 +201,12 @@ function getStream() {
                 var tweetData = getTweetInfo(tweet,state);
                 var type = classifier.classify(tweetData.text);
                 if (type === 'sick') {
-                    console.log(type + ' ' + tweetData.text);
                     async.parallel(states.map(
                         function(cmd) {
                             return function(callback) {
                                 ts.getHits(cmd, '1second', 900, function(err, data) {
                                     if (err) {
-                                        console.log('err: ' + err);
+                                        console.log('last15min err: ' + err);
                                     } else {
                                         var temp = data.map(function(data) {
                                             return data[1];
@@ -225,6 +223,8 @@ function getStream() {
                     // redisServer.zadd(tweetData.state, Date.now(), tweetData.id);
                     if (app.settings.env === 'production') {
                         ts.recordHit(state).exec();
+                    } else {
+                        console.log('sick: ', tweetData.text);
                     }
                 } else {
                     io.sockets.volatile.emit('getTweet', tweetData);
@@ -238,14 +238,13 @@ function getStream() {
         // stream.start();
     });
     stream.on('disconnect', function(disconnect) {
-        console.log('stream disconnect');
-        console.log('by:',stream.abortedBy);
+        console.log('stream disconnect. by:',stream.abortedBy);
     });
     stream.on('reconnect', function (req, res, ival) {
-      console.log('reconnect', ival);
+        console.log('reconnect', ival);
     })/
     stream.on('connect', function (req) {
-      console.log('connect');
+        console.log('connect');
     });
     stream.on('end', function(response) {
         console.log('stream end: ' + response);
