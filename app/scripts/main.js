@@ -372,21 +372,27 @@ function onButtonClick() {
 }
 
 $('#sick').click(function() {
-    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
-    socket.emit('classifyTweet', 'sick', tweet);
-    onButtonClick();
+    if (tweet) {
+        tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+        socket.emit('classifyTweet', 'sick', tweet);
+        onButtonClick();
+    }
 });
 
 $('#notsick').click(function() {
-    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
-    socket.emit('classifyTweet', 'not', tweet);
-    onButtonClick();
+    if (tweet) {
+        tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+        socket.emit('classifyTweet', 'not', tweet);
+        onButtonClick();
+    }
 });
 
 $('#skip').click(function() {
-    tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
-    socket.emit('classifyTweet', 'dono', tweet);
-    onButtonClick();
+    if (tweet) {
+        tweet.text = tweet.text.replace(/(@[^ ]+ )|(@[^ ]+)/g,'').trim();
+        socket.emit('classifyTweet', 'dono', tweet);
+        onButtonClick();
+    }
 });
 
 $('#getTweets').click(function() {
@@ -397,15 +403,15 @@ var intro = introJs();
 var introSteps = [
     {
         element: '.title',
-        intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.\nIt uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data."
+        intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.<br>It uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data.<br><a href=\"https://github.com/eltacodeldiablo/twitterhealth\">Check the source!</a>",
     },
     {
         element: '#chart',
-        intro: "The map displays the number of 'sick' tweets normalized by the average number of 'sick' tweets by state (yellow is below average and purple is above average). The last 100 'sick' tweets that have been received  are displayed as points on the map. Click on an individual state to get look at time series and related data.",
+        intro: "The map displays the number of 'sick' tweets normalized by the average number of 'sick' tweets by state. The last 100 'sick' cities that have been received are displayed as points on the map. Click on an individual state to get look at time series and related data.",
     },
     {
         element: '#tweetClassifer',
-        intro: "Please help train our machine learning algorithm/contribute to open source classified tweet data!\nClick the buttons 'sick', 'not' or 'skip' depending on if the tweet is actually talking about feeling ill/sick, not talking about feeling ill/sick or you can't tell. Keyboard shortcuts to click 'sick', 'not', and 'skip' are 'z', 'x', and 'c' respectively.",
+        intro: "Please help train our machine learning algorithm/contribute to open classified tweet data!<br>Click the buttons 'sick', 'not' or 'skip' depending on if the tweet is actually talking about feeling ill/sick, not talking about feeling ill/sick or you can't tell. Keyboard shortcuts to click 'sick', 'not', and 'skip' are 'z', 'x', and 'c' respectively.",
         position: 'top'
     }
     ];
