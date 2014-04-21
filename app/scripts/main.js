@@ -28,7 +28,12 @@ var states = svg.append('g')
     .attr('class', 'states');
 
 var color = d3.scale.linear()
-    .range(["#f1a340","#f7f7f7","#998ec3"]);
+    // .range(['#f1a340','#f7f7f7','#998ec3']); //orig
+    // .range(['#83B331','yellow','B32A0E']);
+    .range(['#F2E97A','#F1B668','#732F11']); //orange,brown
+    // .range(['#90F96B','#F1CE67','#F9755E']); //green,yellow,red
+    // .range(['#F98252','#F13F9F','#8734F9']); //or,pink,purple
+    // .range(['#40F941','#4AF1F0','#6674F9']);
 
 var isTweetDisplayed = false;
 var tweet;

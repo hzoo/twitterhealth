@@ -59,7 +59,6 @@ app.configure('production', function(){
     ]);
     appFolder = 'dist';
 });
-appFolder = 'dist';
 app.get('/', function (req, res) {
     res.sendfile(__dirname + '/' + appFolder +'/index.html');
 });
