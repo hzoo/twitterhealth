@@ -1,4 +1,4 @@
-/* global io */
+/* global io,twttr,cubism,introJs */
 if (location.host.split(':')[0] === 'localhost') {
     var socket = io.connect('http://localhost:5000');
 } else {
@@ -11,9 +11,6 @@ var projection = d3.geo.albers().translate([width / 2, height / 2]);
 var path = d3.geo.path().projection(projection);
 var tweetLocations = [];
 var active = d3.select(null);
-
-var area = {'AL':4822.023,'AK':731.449,'AZ':6553.255,'AR':2949.131,'CA':38041.430,'CO':5187.582,'CT':3590.347,'DE':917.092,'DC':632.323,'FL':19317.568,'GA':9919.945,'HI':1392.313,'ID':1595.728,'IL':12875.255,'IN':6537.334,'IA':3074.186,'KS':2885.905,'KY':4380.415,'LA':4601.893,'ME':1329.192,'MD':5884.563,'MA':6646.144,'MI':9883.360,'MN':5379.139,'MS':2984.926,'MO':6021.988,'MT':1005.141,'NE':1855.525,'NV':2758.931,'NH':1320.718,'NJ':8864.590,'NM':2085.538,'NY':19570.261,'NC':9752.073,'ND':699.628,'OH':11544.225,'OK':3814.820,'OR':3899.353,'PA':12763.536,'PR':3667.084,'RI':1050.292,'SC':4723.723,'SD':833.354,'TN':6456.243,'TX':26059.203,'UT':2855.287,'VT':626.011,'VA':8185.867,'WA':6897.012,'WV':1855.413,'WI':5726.398,'WY':576.412};
-var pop = {'ND': 723393.0, 'NE': 1868516.0, 'NC': 9848060.0, 'HI': 1404054.0, 'PR': 0, 'NM': 2085287.0, 'NJ': 8899339.0, 'NH': 1323459.0, 'NV': 2790136.0, 'AZ': 6626624.0, 'PA': 12773801.0, 'TN': 6495978.0, 'NY': 19651127.0, 'GA': 9992167.0, 'CT': 3596080.0, 'AL': 4833722.0, 'MT': 1015165.0, 'MS': 2991207.0, 'WV': 1854304.0, 'MO': 6044171.0, 'MN': 5420380.0, 'OK': 3850568.0, 'CA': 38332521.0, 'OR': 3930065.0, 'MI': 9895622.0, 'AR': 2959373.0, 'CO': 5268367.0, 'MD': 5928814.0, 'VT': 626630.0, 'MA': 6692824.0, 'AK': 735132.0, 'IA': 3090416.0, 'UT': 2900872.0, 'ID': 1612136.0, 'WY': 582658.0, 'TX': 26448193.0, 'IN': 6570902.0, 'IL': 12882135.0, 'WA': 6971406.0, 'KY': 4395295.0, 'RI': 1051511.0, 'WI': 5742713.0, 'ME': 1328302.0, 'KS': 2893957.0, 'DE': 925749.0, 'FL': 19552860.0, 'SC': 4774839.0, 'DC': 646449.0, 'OH': 11570808.0, 'SD': 844877.0, 'VA': 8260405.0, 'LA': 4625470.0};
 
 var svg = d3.select('#chart')
     .append('svg')
@@ -135,19 +132,6 @@ function updatePoints(data) {
         .remove();
 }
 
-function resetMap() {
-    //reset
-    tweetLocations = [];
-    updatePoints([]);
-    d3.timer.flush();
-    tweetDensity = getResetStates();
-    color.domain(colorRange);
-    states.selectAll('path')
-        .transition()
-        .duration(500)
-        .style('fill', color(0));
-}
-
 function displayTweet(tweet) {
     var html =
     '<blockquote class=\"twitter-tweet\">' +
@@ -183,10 +167,11 @@ socket.on('getTweet', function (sentData, tweets15min) {
         states.selectAll('path')
         .transition()
           .duration(500)
-          .style('fill', function(d, i) {
+          .style('fill', function(d) {
                 var state = d.properties.code;
+                var percentDiff;
                 if (tweetAverages[state] !== 0) {
-                    var percentDiff = (tweets15min[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
+                    percentDiff = (tweets15min[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
                     if (percentDiff > colorMax) {
                         percentDiff = colorMax;
                     } else if (percentDiff < -1 * colorMax) {
@@ -194,7 +179,7 @@ socket.on('getTweet', function (sentData, tweets15min) {
                     }
                     // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
                 } else {
-                    var percentDiff = 0;
+                    percentDiff = 0;
                 }
                 // console.log(percentDiff);
                 return color(percentDiff);
@@ -232,9 +217,6 @@ socket.on('getTweet', function (sentData, tweets15min) {
 
 var stateArray = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VI','VT','VA','WA','WV','WI','WY','PR'];
 var tweetAverages = {};
-var tweets15min = {};
-var mainTimeline;
-var total = [];
 
 //tweet timeline
 //create metric
@@ -242,30 +224,7 @@ var step;
 var graphSize;
 var context;
 
-function makeWithConcat(len) {
-    var a, rem, currlen;
-    if (len === 0) {
-        return [];
-    }
-    a = [0];
-    currlen = 1;
-    while (currlen < len) {
-        rem = len - currlen;
-        if (rem < currlen) {
-            a = a.concat(a.slice(0, rem));
-        }
-        else {
-            a = a.concat(a);
-        }
-        currlen = a.length;
-    }
-    return a;
-}
-
 function command(state) {
-    var firstTime = true,
-    values = [];
-    // last;
     return context.metric(function(start, stop, step, callback) {
         var data;
         if (state === 'all') {
@@ -273,8 +232,8 @@ function command(state) {
             var numHistory = tweetDensity[stateArray[0]].length;
             for (var i = 0; i < numHistory; i++) {
                 var tempTotal = 0;
-                for (state in tweetDensity) {
-                    tempTotal += tweetDensity[state][i];
+                for (var stateTD in tweetDensity) {
+                    tempTotal += tweetDensity[stateTD][i];
                 }
                 total.push([tempTotal]);
             }
@@ -353,12 +312,12 @@ socket.on('history', function(data){
 
 socket.on('history2', function(data){
     console.log(data);
-    for (state in tweetDensity) {
+    for (var stateTD in tweetDensity) {
         //use last four numbers for the average
-        numTimeToAverage = 4;
-        tweetAverages[state] = tweetDensity[state].slice(-1 * numTimeToAverage).reduce(function(a,b){
+        var numTimeToAverage = 4;
+        tweetAverages[stateTD] = tweetDensity[stateTD].slice(-1 * numTimeToAverage).reduce(function(a,b){
             return a + b;
-        },0)/numTimeToAverage; //tweetDensity[state].length;
+        },0)/numTimeToAverage; //tweetDensity[stateTD].length;
     }
     console.log('history2: ',data);
     console.log('history2: ',tweetAverages);
@@ -369,10 +328,11 @@ socket.on('history2', function(data){
     states.selectAll('path')
         .transition()
           .duration(500)
-          .style('fill', function(d, i) {
+          .style('fill', function(d) {
                 var state = d.properties.code;
+                var percentDiff;
                 if (tweetAverages[state] !== 0) {
-                    var percentDiff = (data[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
+                    percentDiff = (data[stateArray.indexOf(state)] - tweetAverages[state])/tweetAverages[state];
                     // console.log(state,data[stateArray.indexOf(state)],tweetAverages[state]);
                     if (percentDiff > colorMax) {
                         percentDiff = colorMax;
@@ -380,7 +340,7 @@ socket.on('history2', function(data){
                         percentDiff = -1 * colorMax;
                     }
                 } else {
-                    var percentDiff = 0;
+                    percentDiff = 0;
                 }
                 // console.log(percentDiff);
                 return color(percentDiff);
@@ -429,7 +389,7 @@ $('#getTweets').click(function() {
 });
 
 var intro = introJs();
-introSteps = [
+var introSteps = [
     {
         element: '.title',
         intro: "TwitterHealth attempts to display where people are tweeting about illness and sickness.\nIt uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data."
