@@ -473,7 +473,7 @@ $(document).on('keydown', function(event) {
     } else if (event.which === 67) { //c
         event.preventDefault();
         $('#skip').click();
-    } else if (event.which === 73) { //i
+    } else if (event.which === 72) { //h
         event.preventDefault();
         $('#help').click();
     }
