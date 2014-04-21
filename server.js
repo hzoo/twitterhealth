@@ -237,10 +237,24 @@ function getStream() {
         console.log('stream err: ', error, data);
         // stream.start();
     });
+    stream.on('disconnect', function(disconnect) {
+        console.log('stream disconnect');
+        console.log('by:',stream.abortedBy);
+    });
+    stream.on('reconnect', function (req, res, ival) {
+      console.log('reconnect', ival);
+    })/
+    stream.on('connect', function (req) {
+      console.log('connect');
+    });
     stream.on('end', function(response) {
         console.log('stream end: ' + response);
-        stream.stop();
-        stream.start();
+        console.log('by:',stream.abortedBy);
+        if (stream.abortedBy !== null) {
+            // stream.stop();
+            console.log('stream starting');
+            stream.start();
+        }
     });
 }
 
