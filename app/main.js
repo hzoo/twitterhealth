@@ -345,7 +345,7 @@ socket.on('history', function(data){
         tweetDensity[stateArray[i]] = data[i];
     }
 
-    $('#instructions').removeClass('hidden');
+    $('#help').removeClass('hidden');
     if (window.innerWidth > 768) {
         startGraph('all', '#mainTimeline');
     }
@@ -451,23 +451,30 @@ if (window.innerWidth >= 768) {
         intro: "This chart shows the number of tweets per 15 minute interval in the entire united states over the last week.",
         position: 'top'
     });
+    $('#sick').text('Sick [z]');
+    $('#notsick').text('Not [x]');
+    $('#skip').text('Skip [c]');
+    $('#help').text('Help [h]');
 }
 intro.setOptions({
     steps: introSteps
 });
-$('#instructions').click(function() {
+$('#help').click(function() {
     intro.start();
 });
 
 $(document).on('keydown', function(event) {
-    if (event.which === 90) {
+    if (event.which === 90) { //z
         event.preventDefault();
         $('#sick').click();
-    } else if (event.which === 88) {
+    } else if (event.which === 88) { //x
         event.preventDefault();
         $('#notsick').click();
-    } else if (event.which === 67) {
+    } else if (event.which === 67) { //c
         event.preventDefault();
         $('#skip').click();
+    } else if (event.which === 73) { //i
+        event.preventDefault();
+        $('#help').click();
     }
 });
