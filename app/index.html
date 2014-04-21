@@ -6,7 +6,11 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <title>TwitterHealth</title>
-        <link rel="stylesheet" href="main.css">
+        <!-- inject:head:css -->
+        <!-- the rest of the *.css files will be injected here -->
+        <link rel="stylesheet" href="./styles/main.css">
+        <link rel="stylesheet" href="./styles/graph.css">
+        <!-- endinject -->
     </head>
     <body>
         <div class="container">
@@ -40,9 +44,11 @@
         <script src="//cdn.jsdelivr.net/g/jquery,d3js,intro.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.1.0/topojson.min.js"></script>
-        <script src="main.js"></script>
-        <script src="twitter.js" charset="utf-8"></script>
-        <link rel="stylesheet" href="graph.css">
+        <!-- inject:js -->
+        <!-- any *.js files among your sources will go here as: <script src="FILE"></script> -->
+        <script src="./scripts/main.js"></script>
+        <script src="./scripts/twitter.min.js" charset="utf-8"></script>
+        <!-- endinject -->
         <script src="//cdnjs.cloudflare.com/ajax/libs/cubism/1.2.2/cubism.v1.min.js"></script>
         <link rel="stylesheet" href="//cdn.jsdelivr.net/intro.js/0.6.0/introjs.min.css">
     </body>

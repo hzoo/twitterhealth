@@ -10,10 +10,29 @@
     "natural": "~0.1.27",
     "redis-timeseries": "~0.4.0",
     "async": "~0.7.0",
-    "twat": "~0.8.5",
     "firebase": "~1.0.11",
     "firebase-token-generator": "~0.1.4",
     "twit": "~1.1.13"
+  },
+  "devDependencies": {
+    "tiny-lr": "0.0.5",
+    "gulp": "^3.5.2",
+    "gulp-util": "~2.2.14",
+    "gulp-concat": "^2.1.7",
+    "gulp-rename": "^1.1.0",
+    "gulp-uglify": "^0.2.1",
+    "gulp-jshint": "^1.5.0",
+    "gulp-usemin": "^0.3.2",
+    "gulp-clean": "^0.2.4",
+    "gulp-cache": "^0.1.2",
+    "gulp-imagemin": "^0.1.5",
+    "gulp-load-plugins": "^0.3.0",
+    "gulp-size": "^0.1.3",
+    "gulp-csso": "^0.2.6",
+    "gulp-strip-debug": "^0.2.0",
+    "gulp-changed": "^0.2.1",
+    "gulp-inject": "^0.4.1",
+    "gulp-minify-html": "^0.1.1"
   },
   "scripts": {
     "start": "node server.js"

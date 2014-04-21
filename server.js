@@ -24,15 +24,8 @@ server.listen(port, function() {
     console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
 });
 
-app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/app/index.html');
-});
-
-app.use('/', express.static(__dirname + '/app'));
-app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-app.use(express.compress());
-
 var twit;
+var appFolder;
 app.configure('development', function() {
     console.log('running on dev');
     twit = new Twat({
@@ -43,6 +36,7 @@ app.configure('development', function() {
     });
     io.set('log level', 1);
     io.set('transports', ['websocket']);
+    appFolder = 'app';
 });
 app.configure('production', function(){
     console.log('running on prod');
@@ -63,7 +57,15 @@ app.configure('production', function(){
         'xhr-polling',
         'jsonp-polling'
     ]);
+    appFolder = 'dist';
 });
+appFolder = 'dist';
+app.get('/', function (req, res) {
+    res.sendfile(__dirname + '/' + appFolder +'/index.html');
+});
+app.use('/', express.static(__dirname + '/' + appFolder));
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+app.use(express.compress());
 
 //variables
 var trackWords = [
