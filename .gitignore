@@ -20,3 +20,4 @@ tweets.json
 .flooignore
 .floo
 classifier.json
+dist
