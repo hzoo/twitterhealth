@@ -41,6 +41,26 @@ var tweetQueue = [];
 var colorMax = 3;
 var colorRange = [-1 * colorMax, 0, colorMax];
 
+d3.json('./assets/us-named-states.json', function(error, us) {
+    states.selectAll('path')
+    .data(topojson.feature(us, us.objects.states).features.filter(function(state){
+            return state.properties.code !== 'AK';
+        }))
+        .enter().append('path')
+        .attr('d', path)
+        .attr('class', 'state')
+        .attr('id', function(d) { return d.properties.code;})
+        .on('click', clicked);
+
+    color.domain(colorRange);
+    states.selectAll('path')
+        .transition()
+        .duration(500)
+        .style('fill', color(0));
+
+    socket.emit('getPastTweets');
+});
+
 function getResetStates() {
     return {'AL' : [],'AK' : [],'AZ' : [],'AR' : [],'CA' : [],'CO' : [],'CT' : [],'DE' : [],'DC' : [],'FL' : [],'GA' : [],'HI' : [],'ID' : [],'IL' : [],'IN' : [],'IA' : [],'KS' : [],'KY' : [],'LA' : [],'ME' : [],'MD' : [],'MA' : [],'MI' : [],'MN' : [],'MS' : [],'MO' : [],'MT' : [],'NE' : [],'NV' : [],'NH' : [],'NJ' : [],'NM' : [],'NY' : [],'NC' : [],'ND' : [],'OH' : [],'OK' : [],'OR' : [],'PA' : [],'RI' : [],'SC' : [],'SD' : [],'TN' : [],'TX' : [],'UT' : [],'VI': [],'VT' : [],'VA' : [],'WA' : [],'WV' : [],'WI' : [],'WY' : [],'PR' : []};
 }
@@ -90,25 +110,6 @@ function clicked(d) {
         .attr('transform', 'translate(' + translate + ')scale(' + scale + ')');
 }
 
-d3.json('./assets/us-named-states.json', function(error, us) {
-    states.selectAll('path')
-    .data(topojson.feature(us, us.objects.states).features.filter(function(state){
-            return state.properties.code !== 'AK';
-        }))
-        .enter().append('path')
-        .attr('d', path)
-        .attr('class', 'state')
-        .attr('id', function(d) { return d.properties.code;})
-        .on('click', clicked);
-
-    color.domain(colorRange);
-    states.selectAll('path')
-        .transition()
-        .duration(500)
-        .style('fill', color(0));
-
-    socket.emit('getPastTweets');
-});
 
 function updatePoints(data) {
     var text = states.selectAll('circle')
@@ -119,7 +120,7 @@ function updatePoints(data) {
       .attr('cy', function(d) { return d.coord[1]; })
       .attr('r', 0)
       .style('opacity', 0)
-      .style('fill', 'yellow')
+      .style('fill', '#25AAE2')
       .attr('id', function(d){ return 'tweet-' + d.id;})
     .transition()
       .duration(500)
@@ -129,7 +130,7 @@ function updatePoints(data) {
       .delay(500)
       .duration(500)
       .attr('r',5)
-      .style('fill','#F2762E');
+      .style('fill','#0F75BD');
 
     text.exit().transition()
         .duration(function(d,i) { return i * 10 + 100;})
@@ -291,7 +292,8 @@ function startGraph(state, timeline) {
                     })
                     // .colors([0].concat(colorbrewer.Purples[3]))
                     // .colors([0].concat(["#fee6ce","#fdae6b","#e6550d"]))
-                    .colors(["#e66101","#fdb863","#b2abd2","#5e3c99"])
+                    // .colors(["#e66101","#fdb863","#b2abd2","#5e3c99"])
+                    .colors(['#e66101','#e66101','#e66101','#F2E97A','#F1B668','#732F11'])
                     .title(function() {
                         if (state === 'all'){
                             return 'USA';

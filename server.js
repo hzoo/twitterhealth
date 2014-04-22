@@ -26,6 +26,8 @@ server.listen(port, function() {
 
 var twit;
 var appFolder;
+app.use(express.compress());
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 app.configure('development', function() {
     console.log('running on dev');
     twit = new Twat({
@@ -59,12 +61,10 @@ app.configure('production', function(){
     ]);
     appFolder = 'dist';
 });
-app.use(express.compress());
-app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/' + appFolder +'/index.html');
-});
-app.use('/', express.static(__dirname + '/' + appFolder));
+// app.get('/', function (req, res) {
+//     res.sendfile(__dirname + '/' + appFolder +'/index.html');
+// });
+app.use('/', express.static(__dirname + '/' + appFolder), { maxAge: 86400000 });
 
 //variables
 var trackWords = [
@@ -190,6 +190,8 @@ function getStream() {
         'statuses/filter',
         { track: trackWords });
 
+    var previousTweet = '';
+
     stream.on('tweet', function(tweet) {
         //filter out urls and tweets geocoded in usa
         if (tweet.entities.urls.length === 0 && tweet.place && tweet.place.country_code === 'US' && tweet.geo) {
@@ -201,6 +203,12 @@ function getStream() {
             if (state !== undefined && state !== 'US' && state.length === 2) {
                 var tweetData = getTweetInfo(tweet,state);
                 var type = classifier.classify(tweetData.text);
+
+                if (previousTweet === tweetData.text) {
+                    console.log('duplicate tweet');
+                }
+                previousTweet = tweetData.text;
+
                 if (type === 'sick') {
                     async.parallel(states.map(
                         function(cmd) {
