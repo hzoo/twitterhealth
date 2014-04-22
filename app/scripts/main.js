@@ -27,6 +27,8 @@ svg.append('rect')
 var states = svg.append('g')
     .attr('class', 'states');
 
+var colorDomain = ['#F2E97A','#F1B668','#732F11'];
+
 var color = d3.scale.linear()
     // .range(['#f1a340','#f7f7f7','#998ec3']); //orig
     // .range(['#83B331','yellow','B32A0E']);
@@ -40,6 +42,43 @@ var tweet;
 var tweetQueue = [];
 var colorMax = 3;
 var colorRange = [-1 * colorMax, 0, colorMax];
+
+//legend
+var colorMap = [
+["ABOVE", colorDomain[2]],
+["NORMAL", colorDomain[1]],
+["BELOW", colorDomain[0]]
+];
+
+var legend = svg.append("g")
+  .attr("class", "legend")
+  .attr("height", 100)
+  .attr("width", 100);
+
+var legendStartHeight = 400;
+
+legend.selectAll('g').data(colorMap)
+  .enter()
+  .append('g')
+  .each(function(d, i) {
+    var g = d3.select(this);
+    g.append("rect")
+      .attr("x", 250 - 65)
+      .attr("y", i*25 + legendStartHeight)
+      .attr("width", 10)
+      .attr("height", 10)
+      .style("fill", colorMap[i][1]);
+
+    g.append("text")
+      .attr("x", 250 - 50)
+      .attr("y", i * 25 + 10 + legendStartHeight)
+      .attr("height",30)
+      .attr("width",100)
+      .style("fill", 'white')//colorMap[i][1])
+      .attr('font-size','14px')
+      .text(colorMap[i][0]);
+
+  });
 
 d3.json('./assets/us-named-states.json', function(error, us) {
     states.selectAll('path')
