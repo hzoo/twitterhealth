@@ -294,7 +294,7 @@ function command(state) {
             var total = [];
             var numHistory = tweetDensity[stateArray[0]].length;
             for (var i = 0; i < numHistory; i++) {
-                var tempTotal = 0;
+                var tempTotal = 1;
                 for (var stateTD in tweetDensity) {
                     tempTotal += tweetDensity[stateTD][i];
                 }

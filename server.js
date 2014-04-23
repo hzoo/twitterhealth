@@ -92,6 +92,8 @@ var classifierRoot = new Firebase('https://thclassifier.firebaseio.com/');
 var FirebaseTokenGenerator = require('firebase-token-generator');
 var tokenGenerator = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET);
 var token = tokenGenerator.createToken({'username': 'admin'});
+var tokenGenerator2 = new FirebaseTokenGenerator(process.env.FIREBASE_SECRET2);
+var token2 = tokenGenerator2.createToken({'username': 'admin'});
 
 function getTweetInfo(tweet, state) {
     'use strict';
@@ -270,20 +272,27 @@ function getStream() {
 //     JSON.parse(fs.readFileSync('classifier.json', 'utf8')));
 
 tweetsRoot.auth(token, function(error) {
-  if(error) {
-    console.log("Login Failed!", error);
-  } else {
-    console.log("Login Succeeded!");
-    classifierRoot.on('value', function(snapshot) {
-        var val = JSON.parse(snapshot.val());
-        classifier = natural.BayesClassifier.restore(val);
-        // classifier.addDocument('i hate being sick', 'sick');sj
-        // classifier.addDocument('sick of', 'not');
-        // classifier.train();
-        // classifierRoot.set(JSON.stringify(classifier));
-        if (app.settings.env === 'production') {
-            getStream();
-        }
-    });
-  }
+    if (error) {
+        console.log("tweets Login Failed!", error);
+    } else {
+        console.log("tweets Login Succeeded!");
+        classifierRoot.auth(token2, function(error) {
+            if (error) {
+                console.log("classifier Login Failed!", error);
+            } else {
+                console.log("classifier Login Succeeded!");
+                classifierRoot.on('value', function(snapshot) {
+                    var val = JSON.parse(snapshot.val());
+                    classifier = natural.BayesClassifier.restore(val);
+                    // classifier.addDocument('i hate being sick', 'sick');sj
+                    // classifier.addDocument('sick of', 'not');
+                    // classifier.train();
+                    // classifierRoot.set(JSON.stringify(classifier));
+                    if (app.settings.env === 'production') {
+                        getStream();
+                    }
+                });
+            }
+        });
+    }
 });
