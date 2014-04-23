@@ -4,7 +4,7 @@
   "description": "Visualizing Disease with tweet analysis",
   "dependencies": {
     "redis": "~0.10.1",
-    "dotenv": "~0.2.5",
+    "dotenv": "~0.2.8",
     "express": "~3.5.0",
     "socket.io": "~0.9.16",
     "natural": "~0.1.27",
@@ -14,7 +14,7 @@
     "firebase-token-generator": "~0.1.4",
     "twit": "~1.1.13",
     "tiny-lr": "~0.0.5",
-    "gulp": "^3.5.2",
+    "gulp": "^3.6.1",
     "gulp-util": "^2.2.14",
     "gulp-concat": "^2.1.7",
     "gulp-rename": "^1.1.0",
