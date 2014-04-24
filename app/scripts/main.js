@@ -212,7 +212,11 @@ function showTweets() {
 
 socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
-
+    if (tweetQueue.map(function(tweet){
+        return tweet.id;
+    }).indexOf(sendData.id) !== -1) {
+        return;
+    }
     //if tweet is categorized sick by algorithm
     if (tweets15min !== undefined) {
         var state = sentData.state;
