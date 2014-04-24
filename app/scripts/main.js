@@ -212,13 +212,14 @@ function showTweets() {
 
 socket.on('getTweet', function (sentData, tweets15min) {
     // console.log(sentData.text);
-    if (tweetQueue.map(function(tweet){
-        return tweet.id;
-    }).indexOf(sendData.id) !== -1) {
-        return;
-    }
     //if tweet is categorized sick by algorithm
     if (tweets15min !== undefined) {
+        if (tweetQueue.map(function(tweet){
+            return tweet.id;
+        }).indexOf(sentData.id) !== -1) {
+            return;
+        }
+
         var state = sentData.state;
         tweetDensity[state][state.length - 1]++;
         stateDensity[state] += 1/statePopulation[state];
