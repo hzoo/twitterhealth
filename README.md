@@ -18,7 +18,7 @@ A webapp to gather 'sickness' related tweet data.
 ##Guide##
 To Install:
 - install [node.js](http://nodejs.org/)
-- download this repo (`git clone` or download the [zip file](https://github.com/eltacodeldiablo/tweet-health.git))
+- download this repo (`git clone` or download the [zip file](https://github.com/hzoo/tweet-health.git))
 - cd to the folder and run `npm install`
 - create an `.env` file (add with your twitter/api credentials)
 - use seperate twitter api keys for production and development if you don't want to get errors/rate limited.
