@@ -468,7 +468,7 @@ var intro = introJs();
 var introSteps = [
     {
         element: '.title',
-        intro: 'TwitterHealth attempts to display where people are tweeting about illness and sickness.<br>It uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data.<br><a href=\'https://github.com/eltacodeldiablo/twitterhealth\'>Check the source!</a>',
+        intro: 'TwitterHealth attempts to display where people are tweeting about illness and sickness.<br>It uses a machine learning algorithm to filter out tweets that contain sickness related keywords that are used in the wrong context. In addition, it allows the user to contribute to the machine learning classification and help generate classified tweet data.<br><a href=\'https://github.com/hzoo/twitterhealth\'>Check the source!</a>',
     },
     {
         element: '#chart',
